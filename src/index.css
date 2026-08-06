@@ -1,0 +1,13 @@
+/* The page owns its own styling; this is only the reset it assumes. */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #fbfbfb;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

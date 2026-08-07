@@ -22,8 +22,11 @@ const FAQ_QUESTIONS = [
 
 /**
  * `before` / `highlight` / `after` split the quote so the metric can carry the
- * blue italic emphasis. Curly quotes and apostrophes are intentional — copy is
- * verbatim from the design handoff.
+ * blue italic emphasis.
+ *
+ * Punctuation matches BudgetDog exactly: straight double quotes (U+0022) around
+ * the quotation, curly apostrophes (U+2019) inside contractions. Do not "fix"
+ * the straight quotes to typographic ones — theirs are straight.
  */
 type Testimonial = {
   before: string;
@@ -35,72 +38,72 @@ type Testimonial = {
 
 const TESTIMONIALS: Testimonial[] = [
   {
-    before: "“I’m at ",
+    before: "\"I’m at ",
     highlight: "25 units doing around $90,000 a month",
-    after: ". My first one was live in 13 days.”",
+    after: ". My first one was live in 13 days.\"",
     attribution: "- Josh C., Hamilton, ON",
     name: "Josh C.",
   },
   {
-    before: "“",
+    before: "\"",
     highlight: "Nine large units doing about $70,000 a month.",
-    after: " Ten days from signing to live.”",
+    after: " Ten days from signing to live.\"",
     attribution: "- Rob V., Toronto, ON",
     name: "Rob V.",
   },
   {
-    before: "“",
+    before: "\"",
     highlight: "23 units, around $63,000 a month",
-    after: ", and the business qualified me for my E-2 visa.”",
+    after: ", and the business qualified me for my E-2 visa.\"",
     attribution: "- Andy D., Nova Scotia",
     name: "Andy D.",
   },
   {
-    before: "“",
+    before: "\"",
     highlight: "Three units, roughly $10,000 a month",
-    after: ", and I was live in two weeks.”",
+    after: ", and I was live in two weeks.\"",
     attribution: "- Fasi K., Brampton, ON",
     name: "Fasi K.",
   },
   {
-    before: "“Five days from handover to live. ",
+    before: "\"Five days from handover to live. ",
     highlight: "I’m at nine units now, about $24,000 a month.",
-    after: "”",
+    after: "\"",
     attribution: "- Jason L., Toronto, ON",
     name: "Jason L.",
   },
   {
-    before: "“I started with two large units. ",
+    before: "\"I started with two large units. ",
     highlight: "They’re doing around $15,000 a month between them.",
-    after: "”",
+    after: "\"",
     attribution: "- Dennis L., Cookstown, ON",
     name: "Dennis L.",
   },
   {
-    before: "“I came in with one unit and no idea how far it could go. ",
+    before: "\"I came in with one unit and no idea how far it could go. ",
     highlight: "We’re at 30 units now, and it’s a seven-figure business.",
-    after: "”",
+    after: "\"",
     attribution: "- Dylan M., Ancaster, ON",
     name: "Dylan M.",
   },
   {
-    before: "“The turnaround time completely exceeded what I expected. ",
+    before: "\"The turnaround time completely exceeded what I expected. ",
     highlight: "Eight units, live in 15 days.",
-    after: "”",
+    after: "\"",
     attribution: "- Kajana D., Mississauga, ON",
     name: "Kajana D.",
   },
   {
-    before: "“The setup and the management were effortless. ",
+    before: "\"The setup and the management were effortless. ",
     highlight: "They handled all of it",
-    after: " and I just watched it go live.”",
+    after: " and I just watched it go live.\"",
     attribution: "- Trevor H., Rockvale, TN",
     name: "Trevor H.",
   },
   {
-    before: "“",
+    before: "\"",
     highlight: "We’re holding a 25-30% profit margin",
-    after: ", even in the slow season.”",
+    after: ", even in the slow season.\"",
     attribution: "- Jessica & James, St. Petersburg, FL",
     name: "Jessica & James",
   },
@@ -439,13 +442,15 @@ export default function CallConfirmationPage() {
 
         {/* Footer */}
         <footer className="vcc-footer">
-          <p className="vcc-footer__links">
-            <a href={TERMS_URL}>TERMS</a> | <a href={PRIVACY_URL}>PRIVACY</a>
-          </p>
-          <p className="vcc-footer__copy">
-            All rights reserved 2026. This program is brought to you and copyrighted by Vacarya LP
-          </p>
-          <p className="vcc-footer__legal">{LEGAL_DISCLAIMER}</p>
+          <div className="vcc-footer__inner">
+            <p className="vcc-footer__links">
+              <a href={TERMS_URL}>TERMS</a> | <a href={PRIVACY_URL}>PRIVACY</a>
+            </p>
+            <p className="vcc-footer__copy">
+              All rights reserved 2026. This program is brought to you and copyrighted by Vacarya LP
+            </p>
+            <p className="vcc-footer__legal">{LEGAL_DISCLAIMER}</p>
+          </div>
         </footer>
       </main>
     </>
@@ -499,12 +504,13 @@ body:has(.vcc-page) {
 
 .vcc-hero { max-width: 749px; margin: 0 auto; }
 
-/* BudgetDog: Barlow Semi Condensed 44px/57.2px, weight 400, NOT italic. */
+/* BudgetDog: Barlow Semi Condensed 44px/57.2px. The weight and italic live on an
+   inner <strong><em> in their markup, so the rendered text is 700 italic. */
 .vcc-hero__title {
   margin: 0;
   font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  font-style: normal;
+  font-weight: 700;
+  font-style: italic;
   font-size: 44px;
   line-height: 57.2px;
   text-align: center;
@@ -542,14 +548,15 @@ body:has(.vcc-page) {
   overflow: hidden;
 }
 
-/* BudgetDog: Barlow Semi Condensed 34px/44.2px, weight 400, uppercase, WHITE
-   text. Only the background color differs from theirs (their yellow → blue). */
+/* BudgetDog: Barlow Semi Condensed 34px/44.2px, uppercase. Their inner
+   <strong><span style="color:var(--black)"> carries the weight and color, so the
+   rendered header is 700 and BLACK. Only the background differs (yellow → blue). */
 .vcc-card__header {
   margin: 0;
   background: #00ABE5;
-  color: #ffffff;
+  color: #000000;
   font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
-  font-weight: 400;
+  font-weight: 700;
   font-size: 34px;
   line-height: 44.2px;
   letter-spacing: normal;
@@ -566,7 +573,8 @@ body:has(.vcc-page) {
 /* BudgetDog renders the between-card divider as a literal "|" glyph, not a
    drawn box: Barlow Semi Condensed 32px/41.6px, weight 500, 15% grey. */
 .vcc-divider {
-  margin: 30px auto 26px;
+  /* Measured: 20px from the card above to the glyph, 20px to the card below. */
+  margin: 20px auto;
   font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
   font-size: 32px;
   line-height: 41.6px;
@@ -641,11 +649,14 @@ body:has(.vcc-page) {
 
 /* Step 3 — FAQ grid ------------------------------------------------------- */
 
+/* Measured: 10px side padding, 10px gap → two 545px columns in a 1120px card.
+   Row gap 40px matches their video-bottom-to-next-question distance exactly. */
 .vcc-faq {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 10.7px;
+  column-gap: 10px;
   row-gap: 40px;
+  padding: 20.7px 10px 22.7px;
 }
 
 /*
@@ -660,11 +671,12 @@ body:has(.vcc-page) {
   row-gap: 0;
 }
 
-/* BudgetDog: Barlow 24px, weight 400 (not bold), centered, single line. */
+/* BudgetDog: Barlow 24px, centered, single line. Their <strong> wrapper makes
+   the rendered weight 700. */
 .vcc-faq__question {
   margin: 0;
   font-family: 'Barlow', Helvetica, Arial, sans-serif;
-  font-weight: 400;
+  font-weight: 700;
   font-size: 24px;
   line-height: normal;
   text-align: center;
@@ -699,8 +711,12 @@ body:has(.vcc-page) {
   color: #ffffff;
 }
 
+/* Their subline is NOT Barlow — it falls through to the system sans stack, which
+   is why it reads wider and plainer than the condensed line above it. */
 .vcc-cta__line2 {
   display: block;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: normal;
@@ -717,11 +733,14 @@ body:has(.vcc-page) {
  * shares a row track and every video shares the next, so videos in a band stay
  * top-aligned regardless of how tall the quote above them runs.
  */
+/* Measured: 15px side padding, 10px gap → two 540px columns in a 1120px card.
+   Wider inset than the FAQ grid above, which is why their testimonial videos sit
+   further apart than ours did. */
 .vcc-testimonials {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  column-gap: 10.7px;
-  padding: 38px 11.3px 20px;
+  column-gap: 10px;
+  padding: 38px 15px 20px;
 }
 
 .vcc-testimonial {
@@ -761,23 +780,23 @@ body:has(.vcc-page) {
 /* Footer ------------------------------------------------------------------ */
 
 /*
- * BudgetDog's footer type: Barlow, links 20px/700, copy and disclaimer 16px/400,
- * all centered — their disclaimer is NOT left-aligned like the handoff claimed.
- *
- * One deliberate deviation: their footer text computes to white / 42% white,
- * which only works because their live footer sits on a dark band that the saved
- * copy didn't preserve. Reproducing the color literally would render the footer
- * invisible on our #fbfbfb page, so the colors below are the readable
- * equivalents at the same relative contrast. Sizes, weights and alignment are
- * theirs exactly.
+ * BudgetDog's footer is a full-bleed black band (padding 20px 0 30px) carrying
+ * white text, which is what separates it from the page above. Type is Barlow:
+ * links 20px/700 white, copy and disclaimer 16px/400 at 42% white, all centered.
  */
 .vcc-footer {
+  background: #000000;
+  padding: 20px 0 30px;
+  margin-top: 20px;
+  font-family: 'Barlow', Helvetica, Arial, sans-serif;
+}
+
+.vcc-footer__inner {
   max-width: 1120px;
   margin: 0 auto;
-  padding: 42.7px 13.3px 60px;
+  padding: 0 15px;
   text-align: center;
   box-sizing: border-box;
-  font-family: 'Barlow', Helvetica, Arial, sans-serif;
 }
 
 .vcc-footer__links {
@@ -785,17 +804,18 @@ body:has(.vcc-page) {
   font-size: 20px;
   line-height: normal;
   font-weight: 700;
-  color: #000000;
+  color: #ffffff;
 }
 
-.vcc-page .vcc-footer__links a { color: #000000; text-decoration: none; }
+.vcc-page .vcc-footer__links a { color: #ffffff; text-decoration: none; }
+.vcc-page .vcc-footer__links a:hover { color: #ffffff; text-decoration: underline; }
 
 .vcc-footer__copy {
   margin: 16px 0 0;
   font-size: 16px;
   line-height: normal;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.58);
+  color: rgba(255, 255, 255, 0.42);
 }
 
 .vcc-footer__legal {
@@ -803,7 +823,7 @@ body:has(.vcc-page) {
   font-size: 16px;
   line-height: normal;
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.58);
+  color: rgba(255, 255, 255, 0.42);
   text-align: center;
 }
 

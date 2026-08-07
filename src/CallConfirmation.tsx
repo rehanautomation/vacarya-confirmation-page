@@ -340,11 +340,7 @@ export default function CallConfirmationPage() {
             title="Step 2: Accept The Calendar Invite"
             bodyClassName="vcc-body vcc-body--wide"
           >
-            {/* TODO: replace with <VidalyticsVideo videoId="..." /> once the embed lands. */}
-            <Placeholder
-              label={"Video placeholder — Step 2 “Calendar Invite”"}
-              note={"Vidalytics embed · 16:9 · renders 1024 × 576 px at 1920 viewport"}
-            />
+            <VidalyticsVideo videoId="gdS3zkX56PY3q7QX" />
             <VideoCaption>
               Make sure your partner is available for this time. It&rsquo;s very hard to build a
               business together if you&rsquo;re not aligned.

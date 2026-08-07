@@ -712,7 +712,8 @@ body:has(.vcc-page) {
 }
 
 /* Their subline is NOT Barlow — it falls through to the system sans stack, which
-   is why it reads wider and plainer than the condensed line above it. */
+   is why it reads wider and plainer than the condensed line above it. The softer
+   grey-white comes from opacity 0.8 over the green, not a different hex. */
 .vcc-cta__line2 {
   display: block;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
@@ -722,6 +723,7 @@ body:has(.vcc-page) {
   line-height: normal;
   text-transform: uppercase;
   color: #ffffff;
+  opacity: 0.8;
 }
 
 /* Bonus #1 — testimonials ------------------------------------------------- */
@@ -765,8 +767,16 @@ body:has(.vcc-page) {
 .vcc-metric { color: #00ABE5; font-style: italic; }
 .vcc-testimonial__attribution { font-style: italic; }
 
-.vcc-testimonial__video { margin: 2.7px 0 67.3px; }
-.vcc-testimonial--last .vcc-testimonial__video { margin: 2.7px 0 0; }
+/*
+ * Their <figure class="video-container"> carries 10px of padding, so a
+ * testimonial video is 520px inside its 540px column — 25px from the card edge
+ * with a 30px gap between the pair. The FAQ videos have no such padding and do
+ * fill their columns, which is why only this grid needed the inset.
+ */
+/* width:auto overrides .vcc-placeholder's width:100% so the 10px side margins
+   actually narrow the box rather than pushing it out of the column. */
+.vcc-testimonial__video { width: auto; margin: 2.7px 10px 67.3px; }
+.vcc-testimonial--last .vcc-testimonial__video { margin: 2.7px 10px 0; }
 
 /* Bonus #2 — wins grid ---------------------------------------------------- */
 
@@ -828,60 +838,69 @@ body:has(.vcc-page) {
 }
 
 /* Responsive --------------------------------------------------------------
- * The reference is desktop-only. Confirmation-page traffic is mostly mobile,
- * so the grids collapse and the type scales down proportionally. Structure and
- * order are unchanged.
+ * Measured from BudgetDog at 390 / 640 / 767 / 768. They use two breakpoints:
+ *
+ *   767px — grids collapse to one column (at 768 they are still two-up)
+ *   480px — headline type steps down; everything above 480 stays desktop-sized
+ *
+ * The important finding is what does NOT change: their FAQ questions stay 24px
+ * and their testimonial quotes stay 20px/26px at every width. Only the H1,
+ * section headers and hero copy scale. Do not add size overrides for the
+ * question or quote here — that would break parity with their mobile.
  */
 
-@media (max-width: 900px) {
+@media (max-width: 767px) {
+  .vcc-faq { grid-template-columns: 1fr; row-gap: 28px; }
+  .vcc-faq__item { display: block; }
+
+  /* Measured at 390: quote inset 20px from the card edge, video a further 10px
+     in at 30px — same 10px figure padding as desktop, wider column inset.
+     Qualified with .vcc-body because both classes sit on this element and the
+     .vcc-body mobile padding below would otherwise win on source order. */
+  .vcc-body.vcc-testimonials { grid-template-columns: 1fr; padding: 24px 20px 20px; }
+  .vcc-testimonial { display: block; }
+  .vcc-testimonial__video,
+  .vcc-testimonial--last .vcc-testimonial__video { margin: 6px 10px 32px; }
+  .vcc-testimonial:last-child .vcc-testimonial__video { margin-bottom: 0; }
+
   .vcc-wins { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
+  /* Measured: H1 32px/41.6px, section header 22px/28.6px, hero copy 18px, and
+     every card full-bleed at the viewport width (390px at 390px) — so the
+     container loses its side padding and the hero keeps its own. */
   .vcc-page { padding-top: 32px; }
+  .vcc-container { padding: 0; }
+  .vcc-hero { padding: 0 10px; }
 
-  .vcc-hero__title { font-size: 30px; line-height: 36px; }
+  .vcc-hero__title { font-size: 32px; line-height: 41.6px; }
   .vcc-check { width: 30px; height: 30px; vertical-align: -4px; margin-right: 7px; }
   .vcc-hero__body { margin-top: 18px; font-size: 18px; }
   .vcc-hero__body--tight { margin-top: 20px; }
   .vcc-hero-spacer { height: 28px; }
 
-  .vcc-card__header { font-size: 21px; padding: 16px 12px; }
+  .vcc-card__header { font-size: 22px; line-height: 28.6px; padding: 16px 12px; }
 
-  .vcc-body { padding: 16px 12px 18px; }
+  .vcc-body { padding: 16px 10px 18px; }
   .vcc-body--wide,
-  .vcc-body--reviews { padding: 16px 14px 20px; }
-
-  .vcc-caption { font-size: 17px; }
-
-  .vcc-faq { grid-template-columns: 1fr; row-gap: 28px; }
-  .vcc-faq__item { display: block; }
-  .vcc-faq__question { font-size: 20px; }
+  .vcc-body--reviews { padding: 16px 12px 20px; }
+  /* Their FAQ video is 370px at 10px inset in a 390px card. */
+  .vcc-body.vcc-faq { padding: 16px 10px 18px; }
 
   .vcc-cta { padding: 14px 14px 16px; }
   .vcc-cta__line1 { font-size: 20px; }
   .vcc-cta__line2 { font-size: 13px; }
 
-  .vcc-testimonials { grid-template-columns: 1fr; padding: 24px 12px 20px; }
-  .vcc-testimonial { display: block; }
-  .vcc-testimonial__quote { font-size: 17px; line-height: 22px; }
-  .vcc-testimonial__video,
-  .vcc-testimonial--last .vcc-testimonial__video { margin: 6px 0 32px; }
-  .vcc-testimonial:last-child .vcc-testimonial__video { margin-bottom: 0; }
+  .vcc-wins { grid-template-columns: 1fr; }
 
   .vcc-placeholder--md .vcc-placeholder__label { font-size: 15px; }
   .vcc-placeholder--sm .vcc-placeholder__label { font-size: 13px; }
   .vcc-placeholder--xs .vcc-placeholder__label { font-size: 12px; }
 
-  .vcc-footer { padding: 30px 14px 44px; }
+  .vcc-footer__inner { padding: 0 10px; }
   .vcc-footer__links { font-size: 18px; }
   .vcc-footer__copy,
   .vcc-footer__legal { font-size: 14px; }
-}
-
-@media (max-width: 520px) {
-  .vcc-wins { grid-template-columns: 1fr; }
-  .vcc-hero__title { font-size: 26px; line-height: 32px; }
-  .vcc-card__header { font-size: 18px; }
 }
 `;

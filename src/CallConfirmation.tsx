@@ -248,7 +248,11 @@ function SectionCard({
 }
 
 function Divider() {
-  return <div className="vcc-divider" aria-hidden="true" />;
+  return (
+    <div className="vcc-divider" aria-hidden="true">
+      |
+    </div>
+  );
 }
 
 function VideoCaption({ children }: { children: ReactNode }) {
@@ -349,7 +353,7 @@ export default function CallConfirmationPage() {
           {/* Step 3 */}
           <SectionCard title="Step 3: Get Your Questions Answered" bodyClassName="vcc-body vcc-faq">
             {FAQ_QUESTIONS.map((question) => (
-              <div key={question}>
+              <div key={question} className="vcc-faq__item">
                 <h3 className="vcc-faq__question">{question}</h3>
                 {/* TODO: replace with <VidalyticsVideo videoId="..." /> once the embed lands. */}
                 <Placeholder
@@ -453,12 +457,17 @@ export default function CallConfirmationPage() {
 /* -------------------------------------------------------------------------- */
 
 /**
- * The page is a deliberate structural replica of a known high-converting
- * confirmation page, so measurements are exact rather than snapped to the app's
- * spacing scale. Fractional values (53.3 / 26.7 / 21.3 …) come from a 1.5×
- * relationship that runs through the whole design — do not round them
- * individually. Scoped here (rather than in styles.css) because this page opts
- * out of the app's dark theme entirely.
+ * Every value below is measured from budgetdogacademy.com/call-confirmation via
+ * getComputedStyle — this page is a deliberate replica of theirs and the founder
+ * wants it exact. Do not "tidy" these numbers: they are what BudgetDog renders.
+ *
+ * Three faces, matching theirs:
+ *   Barlow Semi Condensed — headlines, hero copy, section headers, CTA
+ *   Barlow                — FAQ questions, captions, footer
+ *   Montserrat 800        — testimonial quotes only
+ *
+ * The only intentional deviations from BudgetDog are the brand color (their
+ * yellow → our blue) and Vacarya's copy.
  */
 const PAGE_CSS = `
 html:has(.vcc-page),
@@ -469,7 +478,7 @@ body:has(.vcc-page) {
 .vcc-page {
   background: #fbfbfb;
   color: #000000;
-  font-family: 'Poppins', Helvetica, Arial, sans-serif;
+  font-family: 'Barlow', Helvetica, Arial, sans-serif;
   padding: 53.3px 0 0;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -488,14 +497,16 @@ body:has(.vcc-page) {
 
 /* Hero -------------------------------------------------------------------- */
 
-.vcc-hero { max-width: 748px; margin: 0 auto; }
+.vcc-hero { max-width: 749px; margin: 0 auto; }
 
+/* BudgetDog: Barlow Semi Condensed 44px/57.2px, weight 400, NOT italic. */
 .vcc-hero__title {
   margin: 0;
-  font-weight: 700;
-  font-style: italic;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-style: normal;
   font-size: 44px;
-  line-height: 50.7px;
+  line-height: 57.2px;
   text-align: center;
   color: #000000;
   text-wrap: balance;
@@ -503,12 +514,15 @@ body:has(.vcc-page) {
 
 .vcc-check { vertical-align: -5px; margin-right: 9px; }
 
+/* BudgetDog: Barlow Semi Condensed 22px, normal line-height, #140c0c, left. */
 .vcc-hero__body {
   margin: 24px 0 0;
-  font-size: 21.3px;
-  line-height: 26.7px;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-size: 22px;
+  line-height: normal;
   font-weight: 400;
-  color: #000000;
+  color: #140c0c;
+  text-align: left;
 }
 
 .vcc-hero__body--tight { margin-top: 26px; }
@@ -519,36 +533,47 @@ body:has(.vcc-page) {
 
 /* Section card ------------------------------------------------------------ */
 
+/* BudgetDog: radius 10px, shadow 0 1px 5px rgba(0,0,0,0.2). */
 .vcc-card {
   display: block;
   background: #ffffff;
-  border-radius: 6.7px;
-  box-shadow: 0 3px 6.7px rgba(0, 0, 0, 0.07);
+  border-radius: 10px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
+/* BudgetDog: Barlow Semi Condensed 34px/44.2px, weight 400, uppercase, WHITE
+   text. Only the background color differs from theirs (their yellow → blue). */
 .vcc-card__header {
   margin: 0;
   background: #00ABE5;
-  color: #000000;
-  font-weight: 700;
-  font-size: 33.3px;
-  line-height: 1.1;
-  letter-spacing: 0;
+  color: #ffffff;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: 34px;
+  line-height: 44.2px;
+  letter-spacing: normal;
   text-transform: uppercase;
   text-align: center;
-  padding: 23.3px 16px;
+  /* Their bar measures 84px tall against a 44.2px line box → 19.9px each side. */
+  padding: 19.9px 16px;
 }
 
 .vcc-body { padding: 20.7px 11.3px 22.7px; }
 .vcc-body--wide { padding: 20.7px 35.3px 27.3px; }
 .vcc-body--reviews { padding: 20.7px 35.3px 20px; }
 
+/* BudgetDog renders the between-card divider as a literal "|" glyph, not a
+   drawn box: Barlow Semi Condensed 32px/41.6px, weight 500, 15% grey. */
 .vcc-divider {
-  width: 4px;
-  height: 26.7px;
-  background: #dddddd;
   margin: 30px auto 26px;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-size: 32px;
+  line-height: 41.6px;
+  font-weight: 500;
+  color: rgba(47, 47, 47, 0.15);
+  text-align: center;
+  user-select: none;
 }
 
 /* Video ------------------------------------------------------------------- */
@@ -561,10 +586,12 @@ body:has(.vcc-page) {
   padding-top: 56.25%;
 }
 
+/* BudgetDog: Barlow 20px, with "Important:" as bold italic. */
 .vcc-caption {
   margin: 10.7px 0 0;
-  font-size: 18.7px;
-  line-height: 26.7px;
+  font-family: 'Barlow', Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  line-height: normal;
   text-align: center;
   color: #000000;
 }
@@ -621,17 +648,32 @@ body:has(.vcc-page) {
   row-gap: 40px;
 }
 
+/*
+ * Each cell spans two row tracks with subgrid, so every question in a row shares
+ * one track and the videos beneath them start at the same y — they stay aligned
+ * even if a question wraps. Same technique as the testimonials below.
+ */
+.vcc-faq__item {
+  grid-row: span 2;
+  display: grid;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+}
+
+/* BudgetDog: Barlow 24px, weight 400 (not bold), centered, single line. */
 .vcc-faq__question {
   margin: 0;
-  font-weight: 700;
-  font-size: 26px;
-  line-height: 29.3px;
+  font-family: 'Barlow', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: normal;
   text-align: center;
   color: #000000;
 }
 
 /* Step 4 — reviews CTA ---------------------------------------------------- */
 
+/* BudgetDog: #00b67a, radius 5px, padding 16px 20px 18px. */
 .vcc-cta {
   display: block;
   margin: 20.7px 0 0;
@@ -639,28 +681,31 @@ body:has(.vcc-page) {
   color: #ffffff;
   text-decoration: none;
   text-align: center;
-  padding: 17.3px 13.3px;
+  padding: 16px 20px 18px;
+  border-radius: 5px;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
   transition: background-color 0.15s ease;
 }
 
 .vcc-page .vcc-cta:hover { background: #00a06c; color: #ffffff; }
 
+/* BudgetDog: line 1 is 28px/700, line 2 is 15px/400 — both plain white. */
 .vcc-cta__line1 {
   display: block;
   font-weight: 700;
   font-size: 28px;
-  line-height: 1.2;
+  line-height: normal;
   text-transform: uppercase;
   color: #ffffff;
 }
 
 .vcc-cta__line2 {
   display: block;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.2;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: normal;
   text-transform: uppercase;
-  color: #eafff6;
+  color: #ffffff;
 }
 
 /* Bonus #1 — testimonials ------------------------------------------------- */
@@ -686,11 +731,14 @@ body:has(.vcc-page) {
   row-gap: 0;
 }
 
+/* BudgetDog uses Montserrat 800 for the quotes only — nothing else on the page
+   uses this face. */
 .vcc-testimonial__quote {
   margin: 0;
-  font-weight: 700;
+  font-family: 'Montserrat', Helvetica, Arial, sans-serif;
+  font-weight: 800;
   font-size: 20px;
-  line-height: 26.7px;
+  line-height: 26px;
   text-align: center;
   color: #000000;
 }
@@ -712,18 +760,30 @@ body:has(.vcc-page) {
 
 /* Footer ------------------------------------------------------------------ */
 
+/*
+ * BudgetDog's footer type: Barlow, links 20px/700, copy and disclaimer 16px/400,
+ * all centered — their disclaimer is NOT left-aligned like the handoff claimed.
+ *
+ * One deliberate deviation: their footer text computes to white / 42% white,
+ * which only works because their live footer sits on a dark band that the saved
+ * copy didn't preserve. Reproducing the color literally would render the footer
+ * invisible on our #fbfbfb page, so the colors below are the readable
+ * equivalents at the same relative contrast. Sizes, weights and alignment are
+ * theirs exactly.
+ */
 .vcc-footer {
-  max-width: 748px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 42.7px 13.3px 60px;
   text-align: center;
   box-sizing: border-box;
+  font-family: 'Barlow', Helvetica, Arial, sans-serif;
 }
 
 .vcc-footer__links {
   margin: 0;
-  font-size: 21.3px;
-  line-height: 26.7px;
+  font-size: 20px;
+  line-height: normal;
   font-weight: 700;
   color: #000000;
 }
@@ -732,19 +792,19 @@ body:has(.vcc-page) {
 
 .vcc-footer__copy {
   margin: 16px 0 0;
-  font-size: 21.3px;
-  line-height: 26.7px;
+  font-size: 16px;
+  line-height: normal;
   font-weight: 400;
-  color: #000000;
+  color: rgba(0, 0, 0, 0.58);
 }
 
 .vcc-footer__legal {
   margin: 21.3px 0 0;
-  font-size: 13.3px;
-  line-height: 20px;
+  font-size: 16px;
+  line-height: normal;
   font-weight: 400;
-  color: #555555;
-  text-align: left;
+  color: rgba(0, 0, 0, 0.58);
+  text-align: center;
 }
 
 /* Responsive --------------------------------------------------------------
@@ -762,7 +822,7 @@ body:has(.vcc-page) {
 
   .vcc-hero__title { font-size: 30px; line-height: 36px; }
   .vcc-check { width: 30px; height: 30px; vertical-align: -4px; margin-right: 7px; }
-  .vcc-hero__body { margin-top: 18px; font-size: 17px; line-height: 24px; }
+  .vcc-hero__body { margin-top: 18px; font-size: 18px; }
   .vcc-hero__body--tight { margin-top: 20px; }
   .vcc-hero-spacer { height: 28px; }
 
@@ -772,18 +832,19 @@ body:has(.vcc-page) {
   .vcc-body--wide,
   .vcc-body--reviews { padding: 16px 14px 20px; }
 
-  .vcc-caption { font-size: 15.5px; line-height: 22px; }
+  .vcc-caption { font-size: 17px; }
 
   .vcc-faq { grid-template-columns: 1fr; row-gap: 28px; }
-  .vcc-faq__question { font-size: 19px; line-height: 24px; }
+  .vcc-faq__item { display: block; }
+  .vcc-faq__question { font-size: 20px; }
 
-  .vcc-cta { padding: 14px 12px; }
-  .vcc-cta__line1 { font-size: 19px; }
+  .vcc-cta { padding: 14px 14px 16px; }
+  .vcc-cta__line1 { font-size: 20px; }
   .vcc-cta__line2 { font-size: 13px; }
 
   .vcc-testimonials { grid-template-columns: 1fr; padding: 24px 12px 20px; }
   .vcc-testimonial { display: block; }
-  .vcc-testimonial__quote { font-size: 17px; line-height: 23px; }
+  .vcc-testimonial__quote { font-size: 17px; line-height: 22px; }
   .vcc-testimonial__video,
   .vcc-testimonial--last .vcc-testimonial__video { margin: 6px 0 32px; }
   .vcc-testimonial:last-child .vcc-testimonial__video { margin-bottom: 0; }
@@ -793,9 +854,9 @@ body:has(.vcc-page) {
   .vcc-placeholder--xs .vcc-placeholder__label { font-size: 12px; }
 
   .vcc-footer { padding: 30px 14px 44px; }
-  .vcc-footer__links,
-  .vcc-footer__copy { font-size: 17px; line-height: 23px; }
-  .vcc-footer__legal { font-size: 12px; line-height: 18px; }
+  .vcc-footer__links { font-size: 18px; }
+  .vcc-footer__copy,
+  .vcc-footer__legal { font-size: 14px; }
 }
 
 @media (max-width: 520px) {

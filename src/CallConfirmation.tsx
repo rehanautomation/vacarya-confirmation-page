@@ -638,7 +638,20 @@ body:has(.vcc-page) {
   row-gap: 40px;
 }
 
-.vcc-partners__portrait { grid-template-columns: repeat(5, 1fr); }
+/*
+ * Three across. Portrait video is mobile-native, so on desktop the constraint is
+ * height, not width: at this card width two columns would make each clip
+ * 537×955px — taller than the usable viewport on a typical laptop, which is
+ * exactly what the responsive-video guidance says to avoid. Three gives 353×628,
+ * the largest size that still fits on screen. Five (the previous count) fit
+ * easily but rendered them too small to watch.
+ *
+ * Ten items over three columns leaves one alone on the last row, so it is placed
+ * in the middle column rather than hanging off the left edge.
+ */
+.vcc-partners__portrait { grid-template-columns: repeat(3, 1fr); }
+
+.vcc-partners__portrait .vcc-partner:last-child:nth-child(3n + 1) { grid-column: 2; }
 
 .vcc-partners__landscape {
   grid-template-columns: repeat(2, 1fr);

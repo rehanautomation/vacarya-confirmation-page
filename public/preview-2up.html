@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Preview — partner videos, 2 vs 3 per row</title>
+    <style>
+      /* Same self-hosted faces the real page uses. */
+      @font-face { font-family: 'Barlow Semi Condensed'; font-style: normal; font-weight: 500;
+        font-display: swap; src: url('/fonts/barlow-semi-condensed-500.woff2') format('woff2'); }
+      @font-face { font-family: 'Barlow Semi Condensed'; font-style: normal; font-weight: 700;
+        font-display: swap; src: url('/fonts/barlow-semi-condensed-700.woff2') format('woff2'); }
+      @font-face { font-family: 'Montserrat'; font-style: normal; font-weight: 800;
+        font-display: swap; src: url('/fonts/montserrat-800.woff2') format('woff2'); }
+
+      html, body { margin: 0; padding: 0; background: #fbfbfb; }
+      *, *::before, *::after { box-sizing: border-box; }
+
+      body {
+        font-family: 'Barlow', Helvetica, Arial, sans-serif;
+        color: #000;
+        padding: 24px 0 60px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Toggle bar — preview only, not part of the real page. */
+      .bar {
+        position: sticky; top: 0; z-index: 10;
+        background: #111; color: #fff; text-align: center;
+        padding: 12px; margin-bottom: 28px;
+        font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+        font-size: 18px; letter-spacing: 0.02em;
+      }
+      .bar button {
+        font: inherit; font-weight: 700; text-transform: uppercase;
+        background: #00ABE5; color: #000; border: 0; border-radius: 5px;
+        padding: 8px 18px; margin: 0 4px; cursor: pointer;
+      }
+      .bar button[aria-pressed='true'] { background: #fff; }
+      .bar .note { display: block; margin-top: 6px; font-size: 14px; opacity: 0.65; }
+
+      .vcc-container {
+        width: 100%; max-width: 1146.7px; margin: 0 auto;
+        padding: 0 13.3px;
+      }
+
+      .vcc-card {
+        background: #fff; border-radius: 10px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .vcc-card__header {
+        margin: 0; background: #00ABE5; color: #000;
+        font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+        font-weight: 700; font-size: 34px; line-height: 44.2px;
+        text-transform: uppercase; text-align: center; padding: 19.9px 16px;
+      }
+
+      .vcc-partners { padding: 38px 15px 24px; }
+
+      .vcc-partners__portrait {
+        display: grid; column-gap: 15px; row-gap: 40px;
+        grid-template-columns: repeat(3, 1fr);
+      }
+      body[data-cols='2'] .vcc-partners__portrait { grid-template-columns: repeat(2, 1fr); }
+
+      .vcc-partner { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+
+      .vcc-partner__name {
+        margin: 0 0 6px;
+        font-family: 'Montserrat', Helvetica, Arial, sans-serif;
+        font-weight: 800; font-size: 20px; line-height: 26px;
+        font-style: italic; text-align: center; color: #000;
+      }
+
+      .vcc-video { width: 100%; }
+      .vcc-video-mount { width: 100%; position: relative; padding-top: 177.78%; }
+
+      @media (max-width: 767px) {
+        .vcc-card__header { font-size: 22px; line-height: 28.6px; padding: 16px 12px; }
+        .vcc-partners { padding: 24px 15px 20px; }
+        .vcc-partners__portrait,
+        body[data-cols='2'] .vcc-partners__portrait {
+          grid-template-columns: repeat(2, 1fr); row-gap: 28px;
+        }
+      }
+      @media (max-width: 480px) {
+        .vcc-container { padding: 0; }
+        .vcc-partners { padding: 16px 10px 20px; }
+        .vcc-partners__portrait,
+        body[data-cols='2'] .vcc-partners__portrait { column-gap: 10px; }
+        .vcc-partner__name { font-size: 16px; line-height: 21px; }
+      }
+    </style>
+  </head>
+  <body data-cols="2">
+    <div class="bar">
+      <button type="button" data-set="2" aria-pressed="true">2 per row</button>
+      <button type="button" data-set="3" aria-pressed="false">3 per row</button>
+      <span class="note">Preview only — the live page is unchanged. Resize the window to check mobile.</span>
+    </div>
+
+    <div class="vcc-container">
+      <section class="vcc-card">
+        <h2 class="vcc-card__header">Step 4: Hear From Our Partners</h2>
+        <div class="vcc-partners">
+          <div class="vcc-partners__portrait" id="grid"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      var PARTNERS = [
+        { id: 'UH3YggU0nB1bDod_', name: '- Josh C., Hamilton, ON' },
+        { id: 'VTab9sdlPcnqYsyw', name: '- Rob V., Toronto, ON' },
+        { id: 'WoB8QPzALc0OUKH6', name: '- Andy D., Nova Scotia' },
+        { id: 'KCxrI1vlcJ71GTP9', name: '- Fasi K., Brampton, ON' },
+        { id: 'LUuJ8wfnCQ7QS1d3', name: '- Dennis L., Cookstown, ON' },
+        { id: 'Q7FZIMLXMLWHNdDk', name: '- Jason L., Toronto, ON' }
+      ];
+
+      var grid = document.getElementById('grid');
+      PARTNERS.forEach(function (p) {
+        var item = document.createElement('div');
+        item.className = 'vcc-partner';
+        item.innerHTML =
+          '<p class="vcc-partner__name">' + p.name + '</p>' +
+          '<div class="vcc-video"><div id="vidalytics_embed_' + p.id + '" class="vcc-video-mount"></div></div>';
+        grid.appendChild(item);
+      });
+
+      // Vidalytics' own loader snippet, one call per player — same as the real page.
+      function loadVidalytics(videoId) {
+        var embedId = 'vidalytics_embed_' + videoId;
+        var base = 'https://fast.vidalytics.com/embeds/xWCLYwSv/' + videoId + '/';
+        (function (v, i, d, a, l, y, t, c, s) {
+          y = '_' + d.toLowerCase(); c = d + 'L';
+          if (!v[d]) { v[d] = {}; } if (!v[c]) { v[c] = {}; } if (!v[y]) { v[y] = {}; }
+          var vl = 'Loader', vli = v[y][vl], vsl = v[c][vl + 'Script'], vlf = v[c][vl + 'Loaded'], ve = 'Embed';
+          if (!vsl) {
+            vsl = function (u, cb) {
+              if (t) { cb(); return; }
+              s = i.createElement('script'); s.type = 'text/javascript'; s.async = 1; s.src = u;
+              s.onload = function () { vlf = 1; cb(); };
+              i.getElementsByTagName('head')[0].appendChild(s);
+            };
+          }
+          vsl(l + 'loader.min.js', function () {
+            if (!vli) { var vlc = v[c][vl]; vli = new vlc(); }
+            vli.loadScript(l + 'player.min.js', function () { var vec = v[d][ve]; t = new vec(); t.run(a); });
+          });
+        })(window, document, 'Vidalytics', embedId, base);
+      }
+
+      PARTNERS.forEach(function (p) { loadVidalytics(p.id); });
+
+      var buttons = document.querySelectorAll('.bar button');
+      Array.prototype.forEach.call(buttons, function (btn) {
+        btn.addEventListener('click', function () {
+          document.body.setAttribute('data-cols', btn.dataset.set);
+          Array.prototype.forEach.call(buttons, function (b) {
+            b.setAttribute('aria-pressed', String(b === btn));
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

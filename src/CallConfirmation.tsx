@@ -170,6 +170,8 @@ function useReviewColumnCount() {
 /* Pending inputs — see design_handoff README "Assets" table                    */
 /* -------------------------------------------------------------------------- */
 
+/** TODO: real client agreement PDF. */
+const AGREEMENT_URL = "#";
 /** TODO: real Terms URL. */
 const TERMS_URL = "#";
 /** TODO: real Privacy URL. */
@@ -282,6 +284,18 @@ function SectionCard({
       <h2 className="vcc-card__header">{title}</h2>
       <div className={bodyClassName}>{children}</div>
     </section>
+  );
+}
+
+/**
+ * Reserves a 16:9 slot for a video that hasn't been supplied yet. Dev-only —
+ * delete each one as its embed lands, and the component with the last of them.
+ */
+function VideoSlot({ label }: { label: string }) {
+  return (
+    <div className="vcc-slot">
+      <span className="vcc-slot__label">{label}</span>
+    </div>
   );
 }
 
@@ -486,7 +500,43 @@ export default function CallConfirmationPage() {
               </button>
             )}
           </SectionCard>
+
+          <Divider />
+
+          {/* Bonus */}
+          <SectionCard
+            title="Bonus: Recent Case Studies"
+            bodyClassName="vcc-body vcc-case-studies"
+          >
+            {/* TODO: replace both with <VidalyticsVideo videoId="..." /> once the
+                embeds land. */}
+            <VideoSlot label="Case study 1" />
+            <VideoSlot label="Case study 2" />
+          </SectionCard>
         </div>
+
+        {/*
+          Deliberately not a section card: no blue banner, no white panel. A dark
+          full-bleed band with one bordered panel floating in it, so the last
+          thing before the footer reads as a distinct moment rather than a
+          seventh card.
+        */}
+        <section className="vcc-agreement">
+          <div className="vcc-agreement__panel">
+            <p className="vcc-agreement__eyebrow">Want to review our agreement before our call?</p>
+            <h2 className="vcc-agreement__title">Review Client Agreement</h2>
+            <p className="vcc-agreement__body">
+              We pride ourselves on transparency and communication. Please take some time to review
+              our client agreement ahead of our call so you know exactly what to expect. The last
+              thing we want is an agreement getting in the way of us building a business together.
+              If you have any questions, please bring them to our call together and we can address
+              them one by one!
+            </p>
+            <a className="vcc-agreement__cta" href={AGREEMENT_URL} target="_blank" rel="noopener">
+              Download Client Agreement
+            </a>
+          </div>
+        </section>
 
         {/* Footer */}
         <footer className="vcc-footer">
@@ -582,7 +632,7 @@ body:has(.vcc-page) {
   line-height: normal;
   font-weight: 400;
   color: #140c0c;
-  text-align: left;
+  text-align: center;
 }
 
 .vcc-hero__body--tight { margin-top: 26px; }
@@ -858,6 +908,110 @@ body:has(.vcc-page) {
   border-radius: 4px;
 }
 
+/* Bonus — case studies ------------------------------------------------------ */
+
+.vcc-case-studies {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  padding: 38px 15px 24px;
+}
+
+/* Dev-only slot for a video still to come. */
+.vcc-slot {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ededed;
+  border: 1px dashed #c7c7c7;
+  border-radius: 4px;
+}
+
+.vcc-slot__label {
+  font-family: 'Barlow', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #5a5a5a;
+}
+
+/* Agreement ----------------------------------------------------------------- */
+
+/*
+ * The one section on the page that is not a card. A dark full-bleed band with a
+ * single bordered panel floating inside it, so the last beat before the footer
+ * lands as its own moment.
+ *
+ * Colours are the brand blue's own hue taken down to near-black for the band and
+ * the panel, which keeps the accent reading as light rather than as a stripe of
+ * unrelated colour. The band is a shade off the pure-black footer beneath it so
+ * the two stay distinct.
+ */
+.vcc-agreement {
+  background: #041C25;
+  padding: 72px 13.3px;
+}
+
+.vcc-agreement__panel {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 48px 52px 52px;
+  background: #0A2C38;
+  border: 1px solid #00ABE5;
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.vcc-agreement__eyebrow {
+  margin: 0;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 19px;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.vcc-agreement__title {
+  margin: 14px 0 0;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1.05;
+  color: #00ABE5;
+}
+
+.vcc-agreement__body {
+  margin: 24px 0 0;
+  font-family: 'Barlow', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 30px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* Same treatment as the reveal button, so the page has one button language. */
+.vcc-agreement__cta {
+  display: inline-block;
+  margin: 34px 0 0;
+  padding: 16px 30px 18px;
+  border-radius: 5px;
+  background: #00ABE5;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease;
+}
+
+.vcc-page .vcc-agreement__cta { color: #000000; text-decoration: none; }
+.vcc-page .vcc-agreement__cta:hover { background: #4fc9f0; color: #000000; }
+
 /* Footer ------------------------------------------------------------------ */
 
 /*
@@ -868,7 +1022,8 @@ body:has(.vcc-page) {
 .vcc-footer {
   background: #000000;
   padding: 20px 0 30px;
-  margin-top: 20px;
+  /* No top margin: the agreement band sits directly above and a gap here would
+     show the light page background as a seam between the two dark areas. */
   font-family: 'Barlow', Helvetica, Arial, sans-serif;
 }
 
@@ -946,6 +1101,12 @@ body:has(.vcc-page) {
      it takes a comfortable share of the width instead. */
   .vcc-more { width: 100%; max-width: 340px; font-size: 21px; }
   .vcc-earnings { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  .vcc-body.vcc-case-studies { padding: 24px 15px 20px; gap: 12px; }
+
+  .vcc-agreement { padding: 52px 15px; }
+  .vcc-agreement__panel { padding: 36px 32px 40px; }
+  .vcc-agreement__title { font-size: 40px; }
 }
 
 @media (max-width: 480px) {
@@ -980,6 +1141,16 @@ body:has(.vcc-page) {
   .vcc-reviews__column { gap: 10px; }
   .vcc-more { font-size: 19px; padding: 14px 14px 16px; }
   .vcc-earnings { gap: 10px; }
+
+  /* Two 16:9 slots side by side on a phone are unwatchable, so they stack. */
+  .vcc-body.vcc-case-studies { grid-template-columns: 1fr; padding: 16px 10px 20px; gap: 10px; }
+
+  .vcc-agreement { padding: 40px 10px; }
+  .vcc-agreement__panel { padding: 28px 20px 32px; border-radius: 12px; }
+  .vcc-agreement__eyebrow { font-size: 16px; letter-spacing: 0.1em; }
+  .vcc-agreement__title { font-size: 32px; }
+  .vcc-agreement__body { font-size: 17px; line-height: 25px; }
+  .vcc-agreement__cta { font-size: 18px; padding: 14px 22px 16px; }
 
 
   .vcc-footer__inner { padding: 0 10px; }

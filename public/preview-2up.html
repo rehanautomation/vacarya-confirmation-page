@@ -64,7 +64,16 @@
         display: grid; column-gap: 15px; row-gap: 40px;
         grid-template-columns: repeat(3, 1fr);
       }
-      body[data-cols='2'] .vcc-partners__portrait { grid-template-columns: repeat(2, 1fr); }
+      /* Two-up, but pulled back: the grid sits in its own narrower centred
+         container so the clips stay a comfortable size instead of filling the
+         card, with generous space around and between them. */
+      body[data-cols='2'] .vcc-partners__portrait {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 640px;
+        margin: 0 auto;
+        column-gap: 40px;
+        row-gap: 48px;
+      }
 
       .vcc-partner { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
 
@@ -84,6 +93,7 @@
         .vcc-partners__portrait,
         body[data-cols='2'] .vcc-partners__portrait {
           grid-template-columns: repeat(2, 1fr); row-gap: 28px;
+          column-gap: 15px; max-width: none;
         }
       }
       @media (max-width: 480px) {

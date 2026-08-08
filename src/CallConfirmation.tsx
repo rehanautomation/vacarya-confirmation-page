@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 
 /* -------------------------------------------------------------------------- */
@@ -72,7 +72,83 @@ const PARTNERS_LANDSCAPE: (Partner & { ratio: number })[] = [
 /** 9:16 — every portrait partner clip renders in this box. */
 const PORTRAIT_RATIO = 177.78;
 
-const WINS_COUNT = 15;
+/**
+ * Client review screenshots, Step 5. Sizes vary widely — the set runs from 0.35
+ * to 1.39 in height-to-width — so they are laid out as a masonry rather than a
+ * grid: a grid sizes every row to its tallest item and leaves dead space under
+ * the shorter ones.
+ *
+ * Dimensions are the real pixel sizes of the files and are set on each <img> so
+ * the browser reserves the correct space and nothing shifts while they load.
+ */
+type Review = { src: string; width: number; height: number };
+
+const REVIEWS: Review[] = [
+  { src: "/reviews/review-1.webp", width: 800, height: 506 },
+  { src: "/reviews/review-2.webp", width: 800, height: 997 },
+  { src: "/reviews/review-3.webp", width: 800, height: 1114 },
+  { src: "/reviews/review-4.webp", width: 800, height: 441 },
+  { src: "/reviews/review-5.webp", width: 800, height: 336 },
+  { src: "/reviews/review-6.webp", width: 800, height: 276 },
+  { src: "/reviews/review-7.webp", width: 800, height: 399 },
+  { src: "/reviews/review-8.webp", width: 800, height: 376 },
+  { src: "/reviews/review-9.webp", width: 800, height: 597 },
+  { src: "/reviews/review-10.webp", width: 800, height: 389 },
+];
+
+const REVIEW_COLUMNS_DESKTOP = 3;
+const REVIEW_COLUMNS_MOBILE = 2;
+const REVIEW_MOBILE_QUERY = "(max-width: 767px)";
+
+/**
+ * Packs reviews into balanced columns, placing the tallest first into whichever
+ * column is currently shortest.
+ *
+ * Ordering by height is what makes the columns finish level. Anything that
+ * preserves file order — including a plain CSS multi-column flow, which can only
+ * break the sequence in place — leaves one column well short of the others with
+ * this set, because two images are roughly three times taller than the rest.
+ */
+function packColumns(items: Review[], columnCount: number): Review[][] {
+  const columns: Review[][] = Array.from({ length: columnCount }, () => []);
+  const heights: number[] = new Array(columnCount).fill(0);
+  const tallestFirst = [...items].sort((a, b) => b.height / b.width - a.height / a.width);
+
+  for (const item of tallestFirst) {
+    let shortest = 0;
+    for (let i = 1; i < columnCount; i += 1) {
+      if (heights[i] < heights[shortest]) shortest = i;
+    }
+    columns[shortest].push(item);
+    // Relative height: every column renders at the same width.
+    heights[shortest] += item.height / item.width;
+  }
+
+  return columns;
+}
+
+/**
+ * The column count has to be known in JS, not just CSS, because the packing
+ * above depends on it. Initialised from the media query rather than defaulting,
+ * so a phone never paints three columns before correcting itself.
+ */
+function useReviewColumnCount() {
+  const [count, setCount] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia(REVIEW_MOBILE_QUERY).matches
+      ? REVIEW_COLUMNS_MOBILE
+      : REVIEW_COLUMNS_DESKTOP,
+  );
+
+  useEffect(() => {
+    const query = window.matchMedia(REVIEW_MOBILE_QUERY);
+    const apply = () => setCount(query.matches ? REVIEW_COLUMNS_MOBILE : REVIEW_COLUMNS_DESKTOP);
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
+  }, []);
+
+  return count;
+}
 
 
 /* -------------------------------------------------------------------------- */
@@ -173,36 +249,6 @@ function VidalyticsVideo({
   );
 }
 
-/**
- * Dev-only slot marker standing in for an asset that hasn't been delivered.
- * Strip these as real embeds/screenshots land — they must not ship.
- */
-function Placeholder({
-  label,
-  note,
-  size = "md",
-  ratio = "16 / 9",
-  className,
-}: {
-  label: string;
-  note: string;
-  size?: "md" | "sm" | "xs";
-  ratio?: string;
-  className?: string;
-}) {
-  return (
-    <div
-      className={["vcc-placeholder", `vcc-placeholder--${size}`, className]
-        .filter(Boolean)
-        .join(" ")}
-      style={{ aspectRatio: ratio }}
-    >
-      <div className="vcc-placeholder__label">{label}</div>
-      <div className="vcc-placeholder__note">{note}</div>
-    </div>
-  );
-}
-
 /* -------------------------------------------------------------------------- */
 /* Section shell                                                               */
 /* -------------------------------------------------------------------------- */
@@ -257,6 +303,8 @@ function VideoCaption({ children }: { children: ReactNode }) {
 /* -------------------------------------------------------------------------- */
 
 export default function CallConfirmationPage() {
+  const reviewColumns = useReviewColumnCount();
+
   useEffect(() => {
     window.scrollTo(0, 0);
     if ("scrollRestoration" in history) {
@@ -373,17 +421,23 @@ export default function CallConfirmationPage() {
           {/* Step 5 */}
           <SectionCard
             title="Step 5: Reviews & Written Wins"
-            bodyClassName="vcc-body vcc-wins"
+            bodyClassName="vcc-body vcc-reviews"
           >
-            {Array.from({ length: WINS_COUNT }, (_, index) => (
-              // TODO: drive from a real image array once the screenshots land.
-              <Placeholder
-                key={index}
-                label={`Wins post screenshot ${index + 1}`}
-                note={"portrait screenshot · ~352 px wide column"}
-                size="xs"
-                ratio="3 / 4"
-              />
+            {packColumns(REVIEWS, reviewColumns).map((column, index) => (
+              <div key={index} className="vcc-reviews__column">
+                {column.map((review) => (
+                  <img
+                    key={review.src}
+                    className="vcc-review"
+                    src={review.src}
+                    width={review.width}
+                    height={review.height}
+                    alt="Client review"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ))}
+              </div>
             ))}
           </SectionCard>
         </div>
@@ -560,46 +614,6 @@ body:has(.vcc-page) {
 .vcc-caption strong { font-weight: 700; font-style: italic; }
 .vcc-caption span { font-style: italic; }
 
-/* Placeholders (dev only — remove with the real assets) -------------------- */
-
-.vcc-placeholder {
-  width: 100%;
-  background: #ededed;
-  border: 1px dashed #c7c7c7;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.vcc-placeholder--md { gap: 9.3px; padding: 16px; }
-.vcc-placeholder--sm { gap: 8px; padding: 13.3px; }
-.vcc-placeholder--xs { gap: 6.7px; padding: 12px; }
-
-.vcc-placeholder__label {
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: #5a5a5a;
-}
-
-.vcc-placeholder--md .vcc-placeholder__label { font-size: 22.7px; line-height: 1.15; }
-.vcc-placeholder--sm .vcc-placeholder__label { font-size: 17.3px; }
-.vcc-placeholder--xs .vcc-placeholder__label { font-size: 16px; }
-
-.vcc-placeholder__note {
-  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  line-height: 1.5;
-  color: #8a8a8a;
-}
-
-.vcc-placeholder--md .vcc-placeholder__note { font-size: 11.3px; }
-.vcc-placeholder--sm .vcc-placeholder__note { font-size: 10px; }
-.vcc-placeholder--xs .vcc-placeholder__note { font-size: 9.3px; }
-
 /* Step 3 — FAQ grid ------------------------------------------------------- */
 
 /* Measured: 10px side padding, 10px gap → two 545px columns in a 1120px card.
@@ -705,13 +719,41 @@ body:has(.vcc-page) {
   color: #000000;
 }
 
-/* Step 5 — reviews & written wins grid ---------------------------------------------------- */
+/* Step 5 — reviews ---------------------------------------------------------- */
 
-.vcc-wins {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10.7px;
-  padding: 20.7px 11.3px 20px;
+/*
+ * Masonry. Flex columns rather than a grid, because the screenshots range from
+ * 0.35 to 1.39 in height-to-width and a grid would size each row to its tallest
+ * item, leaving dead space beneath the rest. Columns are equal width and fill
+ * independently, so images keep their natural height and nothing is padded out.
+ *
+ * Equal-flex columns mean the count is whatever packColumns produced — three on
+ * desktop, two below 767px — with no column-count to keep in sync here.
+ *
+ * Gaps match the partner grid above (15px) so the two sections read as one page.
+ */
+.vcc-reviews {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 38px 15px 24px;
+}
+
+.vcc-reviews__column {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* The screenshots are mostly white, so they need an edge against the white card. */
+.vcc-review {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
 }
 
 /* Footer ------------------------------------------------------------------ */
@@ -792,7 +834,10 @@ body:has(.vcc-page) {
   .vcc-partners__grid { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
   .vcc-partners__stack { max-width: none; gap: 28px; }
 
-  .vcc-wins { grid-template-columns: repeat(2, 1fr); }
+  /* Two columns here comes from packColumns, not CSS — this only tightens the
+     gaps to match the rest of the page at this width. */
+  .vcc-body.vcc-reviews { padding: 24px 15px 20px; gap: 12px; }
+  .vcc-reviews__column { gap: 12px; }
 }
 
 @media (max-width: 480px) {
@@ -822,11 +867,9 @@ body:has(.vcc-page) {
   .vcc-partners__grid { grid-template-columns: repeat(2, 1fr); column-gap: 10px; }
   .vcc-partner__name { font-size: 16px; line-height: 21px; }
 
-  .vcc-wins { grid-template-columns: 1fr; }
+  .vcc-body.vcc-reviews { padding: 16px 10px 20px; gap: 10px; }
+  .vcc-reviews__column { gap: 10px; }
 
-  .vcc-placeholder--md .vcc-placeholder__label { font-size: 15px; }
-  .vcc-placeholder--sm .vcc-placeholder__label { font-size: 13px; }
-  .vcc-placeholder--xs .vcc-placeholder__label { font-size: 12px; }
 
   .vcc-footer__inner { padding: 0 10px; }
   .vcc-footer__logo { height: 84px; margin-bottom: 14px; }

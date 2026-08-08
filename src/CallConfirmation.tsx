@@ -916,8 +916,24 @@ body:has(.vcc-page) {
 .vcc-case-studies {
   display: flex;
   flex-direction: column;
-  gap: 34px;
-  padding: 38px 15px 24px;
+  gap: 52px;
+  padding: 44px 15px 44px;
+}
+
+/*
+ * Held in from the card edges rather than filling it. At full width these ran
+ * 1090px — wider than the Step 1 and 2 videos above them — which made a feature
+ * slot read as the biggest thing on the page.
+ *
+ * The border matters as much as the size: these clips are screen recordings on a
+ * white background, so without an edge they bleed into the white card and the
+ * frame is impossible to place.
+ */
+.vcc-case-study { width: 100%; max-width: 880px; margin: 0 auto; }
+
+.vcc-case-study .vcc-video {
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
 }
 
 /* Agreement ----------------------------------------------------------------- */
@@ -932,9 +948,12 @@ body:has(.vcc-page) {
  * unrelated colour. The band is a shade off the pure-black footer beneath it so
  * the two stay distinct.
  */
+/* The top margin lets the page background show between the last card and this
+   band, so the card's shadow reads as an edge instead of the two merging. */
 .vcc-agreement {
   background: #041C25;
   padding: 72px 13.3px;
+  margin-top: 60px;
 }
 
 .vcc-agreement__panel {
@@ -1085,9 +1104,9 @@ body:has(.vcc-page) {
   .vcc-more { width: 100%; max-width: 340px; font-size: 21px; }
   .vcc-earnings { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
-  .vcc-body.vcc-case-studies { padding: 24px 15px 20px; gap: 26px; }
+  .vcc-body.vcc-case-studies { padding: 30px 15px 30px; gap: 34px; }
 
-  .vcc-agreement { padding: 52px 15px; }
+  .vcc-agreement { padding: 52px 15px; margin-top: 44px; }
   .vcc-agreement__panel { padding: 36px 32px 40px; }
   .vcc-agreement__title { font-size: 40px; }
 }
@@ -1125,9 +1144,10 @@ body:has(.vcc-page) {
   .vcc-more { font-size: 19px; padding: 14px 14px 16px; }
   .vcc-earnings { gap: 10px; }
 
-  .vcc-body.vcc-case-studies { padding: 16px 10px 20px; gap: 22px; }
+  /* Mobile sizing is already right — only the gaps move. */
+  .vcc-body.vcc-case-studies { padding: 20px 10px 24px; gap: 26px; }
 
-  .vcc-agreement { padding: 40px 10px; }
+  .vcc-agreement { padding: 40px 10px; margin-top: 32px; }
   .vcc-agreement__panel { padding: 28px 20px 32px; border-radius: 12px; }
   .vcc-agreement__eyebrow { font-size: 16px; letter-spacing: 0.1em; }
   .vcc-agreement__title { font-size: 32px; }

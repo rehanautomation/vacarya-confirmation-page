@@ -44,7 +44,7 @@ whole design. Do not round them individually.
 | Step 1 video | ✅ Live — Vidalytics `1bPO1F19aT_fHl5g` |
 | Step 2 video | ✅ Live — Vidalytics `gdS3zkX56PY3q7QX` |
 | Step 3 FAQ videos | ✅ Live — all 10 Vidalytics embeds |
-| Step 4 partner videos | ❌ 10 Vidalytics embeds |
+| Step 4 partner videos | ✅ Live — all 12 Vidalytics embeds (10 portrait, 2 landscape) |
 | Step 5 reviews / written wins | ❌ 15 portrait screenshots (3:4) |
 | Terms / Privacy URLs | ❌ currently `#` |
 

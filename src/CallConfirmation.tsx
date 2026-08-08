@@ -23,27 +23,47 @@ const FAQ_QUESTIONS = [
 ] as const;
 
 /**
- * Quotes were removed at the client's request — Step 4 now shows each partner's
- * name and location above their video, nothing else. `attribution` is what
- * renders; `name` only labels the pending video placeholder.
+ * Step 4 shows each partner's name and location above their video, nothing else.
+ *
+ * The set is mixed-orientation, so it renders as two groups: ten portrait clips
+ * in a 5×2 grid, then the two landscape clips at the end. Splitting them is what
+ * keeps every video in a row the same size — mixing 9:16 and 16:9 in one grid
+ * would give ragged rows whatever the column count.
+ *
+ * Every portrait clip is pinned to a single 177.78% (9:16) box even though the
+ * source embeds vary between 176.67% and 177.82%. That spread is under 1% — about
+ * 2px at this size — and normalising it means all ten align exactly, which the
+ * varied values would not.
  */
-type Testimonial = {
+type Partner = {
   attribution: string;
-  name: string;
+  videoId: string;
 };
 
-const TESTIMONIALS: Testimonial[] = [
-  { attribution: "- Josh C., Hamilton, ON", name: "Josh C." },
-  { attribution: "- Rob V., Toronto, ON", name: "Rob V." },
-  { attribution: "- Andy D., Nova Scotia", name: "Andy D." },
-  { attribution: "- Fasi K., Brampton, ON", name: "Fasi K." },
-  { attribution: "- Jason L., Toronto, ON", name: "Jason L." },
-  { attribution: "- Dennis L., Cookstown, ON", name: "Dennis L." },
-  { attribution: "- Dylan M., Ancaster, ON", name: "Dylan M." },
-  { attribution: "- Kajana D., Mississauga, ON", name: "Kajana D." },
-  { attribution: "- Trevor H., Rockvale, TN", name: "Trevor H." },
-  { attribution: "- Jessica & James, St. Petersburg, FL", name: "Jessica & James" },
+/** 9:16, five per row on desktop. */
+const PARTNERS_PORTRAIT: Partner[] = [
+  { attribution: "- Josh C., Hamilton, ON", videoId: "UH3YggU0nB1bDod_" },
+  { attribution: "- Rob V., Toronto, ON", videoId: "VTab9sdlPcnqYsyw" },
+  { attribution: "- Andy D., Nova Scotia", videoId: "WoB8QPzALc0OUKH6" },
+  { attribution: "- Fasi K., Brampton, ON", videoId: "KCxrI1vlcJ71GTP9" },
+  { attribution: "- Dennis L., Cookstown, ON", videoId: "LUuJ8wfnCQ7QS1d3" },
+  { attribution: "- Jason L., Toronto, ON", videoId: "Q7FZIMLXMLWHNdDk" },
+  { attribution: "- Kajana D., Mississauga, ON", videoId: "YMTcLkxOfEPogHig" },
+  { attribution: "- Dylan M., Ancaster, ON", videoId: "C873MB3yzcU4eiHP" },
+  { attribution: "- Trevor J., Toronto", videoId: "WkyXHrLIcfaeY4yr" },
+  { attribution: "- Trevor H., Rockvale, TN", videoId: "pJPnsekIVIAUwxYD" },
 ];
+
+/** Landscape, two per row, at the end. Each keeps its own true aspect ratio —
+ *  forcing them to match would letterbox one or crop the other. */
+const PARTNERS_LANDSCAPE: (Partner & { ratio: number })[] = [
+  // TODO: no location supplied for Tony — confirm and add.
+  { attribution: "- Tony", videoId: "EiwlSXCbZ9Lko_VD", ratio: 56.25 },
+  { attribution: "- Jessica & James, St. Petersburg, FL", videoId: "RtMzfq3hSiEqkV8f", ratio: 66.67 },
+];
+
+/** 9:16 — every portrait partner clip renders in this box. */
+const PORTRAIT_RATIO = 177.78;
 
 const WINS_COUNT = 15;
 
@@ -93,9 +113,20 @@ function loadVidalytics(videoId: string) {
 
 /**
  * A live Vidalytics player. Below-the-fold players stay unloaded until they
- * approach the viewport — the page carries 25 embeds once all assets land.
+ * approach the viewport — the page carries 24 embeds once all assets land.
+ *
+ * `ratio` is the padding-top percentage that reserves the player's box before it
+ * loads: 56.25 for 16:9, 177.78 for 9:16. Defaults to 16:9.
  */
-function VidalyticsVideo({ videoId, eager = false }: { videoId: string; eager?: boolean }) {
+function VidalyticsVideo({
+  videoId,
+  eager = false,
+  ratio = 56.25,
+}: {
+  videoId: string;
+  eager?: boolean;
+  ratio?: number;
+}) {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -126,7 +157,11 @@ function VidalyticsVideo({ videoId, eager = false }: { videoId: string; eager?: 
 
   return (
     <div ref={mountRef} className="vcc-video">
-      <div id={`vidalytics_embed_${videoId}`} className="vcc-video-mount" />
+      <div
+        id={`vidalytics_embed_${videoId}`}
+        className="vcc-video-mount"
+        style={{ paddingTop: `${ratio}%` }}
+      />
     </div>
   );
 }
@@ -289,32 +324,23 @@ export default function CallConfirmationPage() {
           <Divider />
 
           {/* Step 4 */}
-          <SectionCard
-            title="Step 4: Hear From Our Partners"
-            bodyClassName="vcc-body vcc-testimonials"
-          >
-            {TESTIMONIALS.map((testimonial, index) => (
-              <div
-                key={testimonial.attribution}
-                className={[
-                  "vcc-testimonial",
-                  index >= TESTIMONIALS.length - 2 ? "vcc-testimonial--last" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-              >
-                <p className="vcc-testimonial__quote">
-                  <span className="vcc-testimonial__attribution">{testimonial.attribution}</span>
-                </p>
-                {/* TODO: replace with <VidalyticsVideo videoId="..." /> once the embed lands. */}
-                <Placeholder
-                  label={`Testimonial video ${index + 1} — ${testimonial.name}`}
-                  note={"16:9 · 536 × 302 px at 1920 viewport"}
-                  size="sm"
-                  className="vcc-testimonial__video"
-                />
-              </div>
-            ))}
+          <SectionCard title="Step 4: Hear From Our Partners" bodyClassName="vcc-body vcc-partners">
+            <div className="vcc-partners__portrait">
+              {PARTNERS_PORTRAIT.map(({ attribution, videoId }) => (
+                <div key={videoId} className="vcc-partner">
+                  <p className="vcc-partner__name">{attribution}</p>
+                  <VidalyticsVideo videoId={videoId} ratio={PORTRAIT_RATIO} />
+                </div>
+              ))}
+            </div>
+            <div className="vcc-partners__landscape">
+              {PARTNERS_LANDSCAPE.map(({ attribution, videoId, ratio }) => (
+                <div key={videoId} className="vcc-partner">
+                  <p className="vcc-partner__name">{attribution}</p>
+                  <VidalyticsVideo videoId={videoId} ratio={ratio} />
+                </div>
+              ))}
+            </div>
           </SectionCard>
 
           <Divider />
@@ -585,56 +611,59 @@ body:has(.vcc-page) {
   color: #000000;
 }
 
-/* Step 4 — testimonials ------------------------------------------------- */
+/* Step 4 — partner videos ------------------------------------------------ */
 
 /*
- * Each testimonial is one DOM unit (quote + its own video) so the pair stays
- * together when the grid collapses to a single column. Subgrid on the row axis
- * keeps the desktop rendering identical to the reference: every quote
- * shares a row track and every video shares the next, so videos in a band stay
- * top-aligned regardless of how tall the quote above them runs.
+ * Two grids, because the clips are mixed orientation. Ten portrait (9:16) run
+ * five-up, then the two landscape clips run two-up underneath. Keeping them in
+ * separate grids is what makes every video in a row identical in size — one
+ * grid holding both shapes would give ragged rows at any column count.
+ *
+ * Spacing is deliberately uniform: the side padding equals the column gap
+ * (15px), so the space outside the outer videos matches the space between them.
+ * Row gap is larger (40px) because each row carries a name above its video.
+ *
+ * Each partner is one subgrid unit spanning the name track and the video track,
+ * so names sharing a row share a height and every video in that row starts at
+ * the same y — true even when a longer name wraps.
  */
-/* Measured: 15px side padding, 10px gap → two 540px columns in a 1120px card.
-   Wider inset than the FAQ grid above, which is why their testimonial videos sit
-   further apart than ours did. */
-.vcc-testimonials {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 10px;
-  padding: 38px 15px 20px;
+.vcc-partners {
+  padding: 38px 15px 24px;
 }
 
-.vcc-testimonial {
+.vcc-partners__portrait,
+.vcc-partners__landscape {
+  display: grid;
+  column-gap: 15px;
+  row-gap: 40px;
+}
+
+.vcc-partners__portrait { grid-template-columns: repeat(5, 1fr); }
+
+.vcc-partners__landscape {
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 40px;
+}
+
+.vcc-partner {
   display: grid;
   grid-row: span 2;
   grid-template-rows: subgrid;
   row-gap: 0;
 }
 
-/* BudgetDog uses Montserrat 800 for the quotes only — nothing else on the page
-   uses this face. */
-.vcc-testimonial__quote {
-  margin: 0;
+/* Montserrat 800 is used for these names only — nothing else on the page uses
+   this face. Italic and size carried over from the original attribution line. */
+.vcc-partner__name {
+  margin: 0 0 6px;
   font-family: 'Montserrat', Helvetica, Arial, sans-serif;
   font-weight: 800;
   font-size: 20px;
   line-height: 26px;
+  font-style: italic;
   text-align: center;
   color: #000000;
 }
-
-.vcc-testimonial__attribution { font-style: italic; }
-
-/*
- * Their <figure class="video-container"> carries 10px of padding, so a
- * testimonial video is 520px inside its 540px column — 25px from the card edge
- * with a 30px gap between the pair. The FAQ videos have no such padding and do
- * fill their columns, which is why only this grid needed the inset.
- */
-/* width:auto overrides .vcc-placeholder's width:100% so the 10px side margins
-   actually narrow the box rather than pushing it out of the column. */
-.vcc-testimonial__video { width: auto; margin: 2.7px 10px 67.3px; }
-.vcc-testimonial--last .vcc-testimonial__video { margin: 2.7px 10px 0; }
 
 /* Step 5 — reviews & written wins grid ---------------------------------------------------- */
 
@@ -712,15 +741,14 @@ body:has(.vcc-page) {
   .vcc-faq { grid-template-columns: 1fr; row-gap: 28px; }
   .vcc-faq__item { display: block; }
 
-  /* Measured at 390: quote inset 20px from the card edge, video a further 10px
-     in at 30px — same 10px figure padding as desktop, wider column inset.
-     Qualified with .vcc-body because both classes sit on this element and the
+  /* Portrait clips step down to three across; landscape stays two-up. Qualified
+     with .vcc-body because both classes sit on the same element and the
      .vcc-body mobile padding below would otherwise win on source order. */
-  .vcc-body.vcc-testimonials { grid-template-columns: 1fr; padding: 24px 20px 20px; }
-  .vcc-testimonial { display: block; }
-  .vcc-testimonial__video,
-  .vcc-testimonial--last .vcc-testimonial__video { margin: 6px 10px 32px; }
-  .vcc-testimonial:last-child .vcc-testimonial__video { margin-bottom: 0; }
+  /* Two across rather than three: ten splits evenly into 2 or 5 columns only, and
+     three would leave a single orphan on the last row. */
+  .vcc-body.vcc-partners { padding: 24px 15px 20px; }
+  .vcc-partners__portrait { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
+  .vcc-partners__landscape { margin-top: 28px; row-gap: 28px; }
 
   .vcc-wins { grid-template-columns: repeat(2, 1fr); }
 }
@@ -746,6 +774,12 @@ body:has(.vcc-page) {
   /* Their FAQ video is 370px at 10px inset in a 390px card. */
   .vcc-body.vcc-faq { padding: 16px 10px 18px; }
 
+  /* Two portrait clips still read well side by side on a phone; the landscape
+     pair stacks, since two 16:9 boxes at half a phone width are unwatchable. */
+  .vcc-body.vcc-partners { padding: 16px 10px 20px; }
+  .vcc-partners__portrait { grid-template-columns: repeat(2, 1fr); column-gap: 10px; }
+  .vcc-partners__landscape { grid-template-columns: 1fr; column-gap: 10px; }
+  .vcc-partner__name { font-size: 16px; line-height: 21px; }
 
   .vcc-wins { grid-template-columns: 1fr; }
 

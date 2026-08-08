@@ -73,6 +73,18 @@ const PARTNERS_LANDSCAPE: (Partner & { ratio: number })[] = [
 const PORTRAIT_RATIO = 177.78;
 
 /**
+ * Bonus card. Two landscape clips, stacked rather than side by side so each gets
+ * the card's full width.
+ *
+ * TODO: Patricia's location is taken from the "CA" on her Trustpilot review,
+ * which is ambiguous — confirm whether that is Canada or California.
+ */
+const CASE_STUDIES: Partner[] = [
+  { name: "Kajana D.", location: "Mississauga, ON", videoId: "r8cg1w54h5ld2Yqh" },
+  { name: "Patricia", location: "Canada", videoId: "Giqo4Xgx53dNyznB" },
+];
+
+/**
  * Client review screenshots, Step 5. Sizes vary widely — the set runs from 0.35
  * to 1.39 in height-to-width — so they are laid out as a masonry rather than a
  * grid: a grid sizes every row to its tallest item and leaves dead space under
@@ -287,18 +299,6 @@ function SectionCard({
   );
 }
 
-/**
- * Reserves a 16:9 slot for a video that hasn't been supplied yet. Dev-only —
- * delete each one as its embed lands, and the component with the last of them.
- */
-function VideoSlot({ label }: { label: string }) {
-  return (
-    <div className="vcc-slot">
-      <span className="vcc-slot__label">{label}</span>
-    </div>
-  );
-}
-
 /** Name on the first line, location on the second — never split mid-location by
  *  the column width. */
 function PartnerName({ name, location }: { name: string; location: string }) {
@@ -508,10 +508,12 @@ export default function CallConfirmationPage() {
             title="Bonus: Recent Case Studies"
             bodyClassName="vcc-body vcc-case-studies"
           >
-            {/* TODO: replace both with <VidalyticsVideo videoId="..." /> once the
-                embeds land. */}
-            <VideoSlot label="Case study 1" />
-            <VideoSlot label="Case study 2" />
+            {CASE_STUDIES.map(({ name, location, videoId }) => (
+              <div key={videoId} className="vcc-case-study">
+                <PartnerName name={name} location={location} />
+                <VidalyticsVideo videoId={videoId} />
+              </div>
+            ))}
           </SectionCard>
         </div>
 
@@ -523,17 +525,16 @@ export default function CallConfirmationPage() {
         */}
         <section className="vcc-agreement">
           <div className="vcc-agreement__panel">
-            <p className="vcc-agreement__eyebrow">Want to review our agreement before our call?</p>
-            <h2 className="vcc-agreement__title">Review Client Agreement</h2>
+            <p className="vcc-agreement__eyebrow">Want to review the agreement before your call?</p>
+            <h2 className="vcc-agreement__title">Review the Partnership Agreement</h2>
             <p className="vcc-agreement__body">
-              We pride ourselves on transparency and communication. Please take some time to review
-              our client agreement ahead of our call so you know exactly what to expect. The last
-              thing we want is an agreement getting in the way of us building a business together.
-              If you have any questions, please bring them to our call together and we can address
-              them one by one!
+              We believe in being completely transparent upfront. You can review the partnership
+              agreement before your call so you know exactly how everything is structured and what
+              to expect. If you have any questions, bring them to the call and we can walk through
+              them together.
             </p>
             <a className="vcc-agreement__cta" href={AGREEMENT_URL} target="_blank" rel="noopener">
-              Download Client Agreement
+              Review Partnership Agreement
             </a>
           </div>
         </section>
@@ -910,31 +911,13 @@ body:has(.vcc-page) {
 
 /* Bonus — case studies ------------------------------------------------------ */
 
+/* Stacked rather than side by side, so each clip gets the card's full width —
+   at two-up they were half the size of the Step 1 and 2 videos above them. */
 .vcc-case-studies {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  padding: 38px 15px 24px;
-}
-
-/* Dev-only slot for a video still to come. */
-.vcc-slot {
-  aspect-ratio: 16 / 9;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ededed;
-  border: 1px dashed #c7c7c7;
-  border-radius: 4px;
-}
-
-.vcc-slot__label {
-  font-family: 'Barlow', Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  font-size: 17px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: #5a5a5a;
+  flex-direction: column;
+  gap: 34px;
+  padding: 38px 15px 24px;
 }
 
 /* Agreement ----------------------------------------------------------------- */
@@ -1102,7 +1085,7 @@ body:has(.vcc-page) {
   .vcc-more { width: 100%; max-width: 340px; font-size: 21px; }
   .vcc-earnings { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 
-  .vcc-body.vcc-case-studies { padding: 24px 15px 20px; gap: 12px; }
+  .vcc-body.vcc-case-studies { padding: 24px 15px 20px; gap: 26px; }
 
   .vcc-agreement { padding: 52px 15px; }
   .vcc-agreement__panel { padding: 36px 32px 40px; }
@@ -1142,8 +1125,7 @@ body:has(.vcc-page) {
   .vcc-more { font-size: 19px; padding: 14px 14px 16px; }
   .vcc-earnings { gap: 10px; }
 
-  /* Two 16:9 slots side by side on a phone are unwatchable, so they stack. */
-  .vcc-body.vcc-case-studies { grid-template-columns: 1fr; padding: 16px 10px 20px; gap: 10px; }
+  .vcc-body.vcc-case-studies { padding: 16px 10px 20px; gap: 22px; }
 
   .vcc-agreement { padding: 40px 10px; }
   .vcc-agreement__panel { padding: 28px 20px 32px; border-radius: 12px; }

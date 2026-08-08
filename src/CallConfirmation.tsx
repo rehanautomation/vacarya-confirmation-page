@@ -25,41 +25,48 @@ const FAQ_QUESTIONS = [
 /**
  * Step 4 shows each partner's name and location above their video, nothing else.
  *
- * The set is mixed-orientation, so it renders as two groups: ten portrait clips
- * in a 5×2 grid, then the two landscape clips at the end. Splitting them is what
- * keeps every video in a row the same size — mixing 9:16 and 16:9 in one grid
- * would give ragged rows whatever the column count.
+ * Ten portrait clips run three across; the two landscape clips stack beside the
+ * tenth, filling the row it would otherwise leave half empty.
  *
  * Every portrait clip is pinned to a single 177.78% (9:16) box even though the
  * source embeds vary between 176.67% and 177.82%. That spread is under 1% — about
  * 2px at this size — and normalising it means all ten align exactly, which the
  * varied values would not.
+ *
+ * Name and location are stored apart so each renders on its own line, rather
+ * than as one string that wraps wherever the column happens to break.
  */
 type Partner = {
-  attribution: string;
+  name: string;
+  location: string;
   videoId: string;
 };
 
-/** 9:16, five per row on desktop. */
+/** 9:16, three per row on desktop. */
 const PARTNERS_PORTRAIT: Partner[] = [
-  { attribution: "- Josh C., Hamilton, ON", videoId: "UH3YggU0nB1bDod_" },
-  { attribution: "- Rob V., Toronto, ON", videoId: "VTab9sdlPcnqYsyw" },
-  { attribution: "- Andy D., Nova Scotia", videoId: "WoB8QPzALc0OUKH6" },
-  { attribution: "- Fasi K., Brampton, ON", videoId: "KCxrI1vlcJ71GTP9" },
-  { attribution: "- Dennis L., Cookstown, ON", videoId: "LUuJ8wfnCQ7QS1d3" },
-  { attribution: "- Jason L., Toronto, ON", videoId: "Q7FZIMLXMLWHNdDk" },
-  { attribution: "- Kajana D., Mississauga, ON", videoId: "YMTcLkxOfEPogHig" },
-  { attribution: "- Dylan M., Ancaster, ON", videoId: "C873MB3yzcU4eiHP" },
-  { attribution: "- Trevor J., Toronto", videoId: "WkyXHrLIcfaeY4yr" },
-  { attribution: "- Trevor H., Rockvale, TN", videoId: "pJPnsekIVIAUwxYD" },
+  { name: "Josh C.", location: "Hamilton, ON", videoId: "UH3YggU0nB1bDod_" },
+  { name: "Rob V.", location: "Toronto, ON", videoId: "VTab9sdlPcnqYsyw" },
+  { name: "Andy D.", location: "Nova Scotia", videoId: "WoB8QPzALc0OUKH6" },
+  { name: "Fasi K.", location: "Brampton, ON", videoId: "KCxrI1vlcJ71GTP9" },
+  { name: "Dennis L.", location: "Cookstown, ON", videoId: "LUuJ8wfnCQ7QS1d3" },
+  { name: "Jason L.", location: "Toronto, ON", videoId: "Q7FZIMLXMLWHNdDk" },
+  { name: "Kajana D.", location: "Mississauga, ON", videoId: "YMTcLkxOfEPogHig" },
+  { name: "Dylan M.", location: "Ancaster, ON", videoId: "C873MB3yzcU4eiHP" },
+  { name: "Trevor J.", location: "Toronto", videoId: "WkyXHrLIcfaeY4yr" },
+  { name: "Trevor H.", location: "Rockvale, TN", videoId: "pJPnsekIVIAUwxYD" },
 ];
 
-/** Landscape, two per row, at the end. Each keeps its own true aspect ratio —
- *  forcing them to match would letterbox one or crop the other. */
+/** Landscape. These stack beside the last portrait clip on desktop, and each
+ *  keeps its own true aspect ratio — forcing them to match would letterbox one
+ *  or crop the other. */
 const PARTNERS_LANDSCAPE: (Partner & { ratio: number })[] = [
-  // TODO: no location supplied for Tony — confirm and add.
-  { attribution: "- Tony", videoId: "EiwlSXCbZ9Lko_VD", ratio: 56.25 },
-  { attribution: "- Jessica & James, St. Petersburg, FL", videoId: "RtMzfq3hSiEqkV8f", ratio: 66.67 },
+  { name: "Tony G.", location: "Toronto, ON", videoId: "EiwlSXCbZ9Lko_VD", ratio: 56.25 },
+  {
+    name: "Jessica & James",
+    location: "St. Petersburg, FL",
+    videoId: "RtMzfq3hSiEqkV8f",
+    ratio: 66.67,
+  },
 ];
 
 /** 9:16 — every portrait partner clip renders in this box. */
@@ -217,6 +224,18 @@ function SectionCard({
   );
 }
 
+/** Name on the first line, location on the second — never split mid-location by
+ *  the column width. */
+function PartnerName({ name, location }: { name: string; location: string }) {
+  return (
+    <p className="vcc-partner__name">
+      - {name}
+      <br />
+      {location}
+    </p>
+  );
+}
+
 function Divider() {
   return (
     <div className="vcc-divider" aria-hidden="true">
@@ -277,13 +296,17 @@ export default function CallConfirmationPage() {
               We look forward to speaking with you during your scheduled time!
             </p>
             <p className="vcc-hero__body vcc-hero__body--tight">
-              Before your call, make sure you watch the videos on this page. They&rsquo;re an
-              important part of the process and will give you the context you need, so when we speak
-              we can build on that and get into how this would actually apply to you.
+              Before your call,{" "}
+              <span className="vcc-underline">make sure you watch the videos on this page.</span>{" "}
+              They&rsquo;re an important part of the process and will give you the context you need,
+              so when we speak we can build on that and get into how this would actually apply to
+              you.
             </p>
             <p className="vcc-hero__body vcc-hero__body--tight">
-              Expect a quick call or text from +1 (302) 566 0034 prior to your scheduled call from a
-              member of our advisory team.
+              <strong>
+                Expect a quick call or text from +1 (302) 566 0034 prior to your scheduled call from
+                a member of our advisory team.
+              </strong>
             </p>
           </header>
 
@@ -293,8 +316,8 @@ export default function CallConfirmationPage() {
           <SectionCard title="Step 1: Call Confirmation" bodyClassName="vcc-body vcc-body--wide">
             <VidalyticsVideo videoId="1bPO1F19aT_fHl5g" eager />
             <VideoCaption>
-              Please send this page to your spouse right now. It has important information they need
-              to know about the call.
+              Make sure to add this call to your calendar and ensure your spouse/business partner is
+              available for this time
             </VideoCaption>
           </SectionCard>
 
@@ -304,8 +327,8 @@ export default function CallConfirmationPage() {
           <SectionCard title="Step 2: How It All Works" bodyClassName="vcc-body vcc-body--wide">
             <VidalyticsVideo videoId="gdS3zkX56PY3q7QX" />
             <VideoCaption>
-              Make sure your partner is available for this time. It&rsquo;s very hard to build a
-              business together if you&rsquo;re not aligned.
+              Make sure to add this call to your calendar and ensure your spouse/business partner is
+              available for this time
             </VideoCaption>
           </SectionCard>
 
@@ -325,21 +348,23 @@ export default function CallConfirmationPage() {
 
           {/* Step 4 */}
           <SectionCard title="Step 4: Hear From Our Partners" bodyClassName="vcc-body vcc-partners">
-            <div className="vcc-partners__portrait">
-              {PARTNERS_PORTRAIT.map(({ attribution, videoId }) => (
+            <div className="vcc-partners__grid">
+              {PARTNERS_PORTRAIT.map(({ name, location, videoId }) => (
                 <div key={videoId} className="vcc-partner">
-                  <p className="vcc-partner__name">{attribution}</p>
+                  <PartnerName name={name} location={location} />
                   <VidalyticsVideo videoId={videoId} ratio={PORTRAIT_RATIO} />
                 </div>
               ))}
-            </div>
-            <div className="vcc-partners__landscape">
-              {PARTNERS_LANDSCAPE.map(({ attribution, videoId, ratio }) => (
-                <div key={videoId} className="vcc-partner">
-                  <p className="vcc-partner__name">{attribution}</p>
-                  <VidalyticsVideo videoId={videoId} ratio={ratio} />
-                </div>
-              ))}
+              {/* Spans the two columns beside the tenth portrait clip on desktop,
+                  and the full width once the grid drops to two columns. */}
+              <div className="vcc-partners__stack">
+                {PARTNERS_LANDSCAPE.map(({ name, location, videoId, ratio }) => (
+                  <div key={videoId} className="vcc-partner-wide">
+                    <PartnerName name={name} location={location} />
+                    <VidalyticsVideo videoId={videoId} ratio={ratio} />
+                  </div>
+                ))}
+              </div>
             </div>
           </SectionCard>
 
@@ -614,48 +639,33 @@ body:has(.vcc-page) {
 /* Step 4 — partner videos ------------------------------------------------ */
 
 /*
- * Two grids, because the clips are mixed orientation. Ten portrait (9:16) run
- * five-up, then the two landscape clips run two-up underneath. Keeping them in
- * separate grids is what makes every video in a row identical in size — one
- * grid holding both shapes would give ragged rows at any column count.
+ * One grid holds everything. Ten portrait clips (9:16) flow three across, which
+ * leaves the tenth alone on the last row; the two landscape clips sit in a
+ * stack that spans the two free columns beside it. That fills the last row
+ * instead of stranding one clip in the middle with a separate row underneath.
  *
- * Spacing is deliberately uniform: the side padding equals the column gap
- * (15px), so the space outside the outer videos matches the space between them.
- * Row gap is larger (40px) because each row carries a name above its video.
+ * Portrait video is mobile-native, so on desktop the constraint is height, not
+ * width: two columns would make each clip 537×955px, taller than the usable
+ * viewport on a typical laptop. Three gives 353×628, the largest that still fits
+ * on screen.
  *
- * Each partner is one subgrid unit spanning the name track and the video track,
- * so names sharing a row share a height and every video in that row starts at
- * the same y — true even when a longer name wraps.
+ * Spacing is uniform: side padding equals the column gap (15px), so the space
+ * outside the outer videos matches the space between them. Row gap is larger
+ * (40px) because each row carries a name above its video.
+ *
+ * Each portrait partner is a subgrid unit spanning the name track and the video
+ * track, so names sharing a row share a height and every video in that row
+ * starts at the same y, even when a name runs long.
  */
 .vcc-partners {
   padding: 38px 15px 24px;
 }
 
-.vcc-partners__portrait,
-.vcc-partners__landscape {
+.vcc-partners__grid {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   column-gap: 15px;
   row-gap: 40px;
-}
-
-/*
- * Three across. Portrait video is mobile-native, so on desktop the constraint is
- * height, not width: at this card width two columns would make each clip
- * 537×955px — taller than the usable viewport on a typical laptop, which is
- * exactly what the responsive-video guidance says to avoid. Three gives 353×628,
- * the largest size that still fits on screen. Five (the previous count) fit
- * easily but rendered them too small to watch.
- *
- * Ten items over three columns leaves one alone on the last row, so it is placed
- * in the middle column rather than hanging off the left edge.
- */
-.vcc-partners__portrait { grid-template-columns: repeat(3, 1fr); }
-
-.vcc-partners__portrait .vcc-partner:last-child:nth-child(3n + 1) { grid-column: 2; }
-
-.vcc-partners__landscape {
-  grid-template-columns: repeat(2, 1fr);
-  margin-top: 40px;
 }
 
 .vcc-partner {
@@ -665,8 +675,25 @@ body:has(.vcc-page) {
   row-gap: 0;
 }
 
+/*
+ * The landscape pair occupies the two columns left free by the tenth portrait
+ * clip. Its width is capped so the two stacked clips plus their names come out
+ * the same height as the portrait clip beside them — at full span they would
+ * overshoot it by roughly 300px and leave the row visibly ragged.
+ */
+.vcc-partners__stack {
+  grid-column: span 2;
+  grid-row: span 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 444px;
+  margin: 0 auto;
+}
+
 /* Montserrat 800 is used for these names only — nothing else on the page uses
-   this face. Italic and size carried over from the original attribution line. */
+   this face. */
 .vcc-partner__name {
   margin: 0 0 6px;
   font-family: 'Montserrat', Helvetica, Arial, sans-serif;
@@ -760,8 +787,10 @@ body:has(.vcc-page) {
   /* Two across rather than three: ten splits evenly into 2 or 5 columns only, and
      three would leave a single orphan on the last row. */
   .vcc-body.vcc-partners { padding: 24px 15px 20px; }
-  .vcc-partners__portrait { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
-  .vcc-partners__landscape { margin-top: 28px; row-gap: 28px; }
+  /* Two portrait clips across; the landscape stack then spans both columns at
+     full width, so it needs no cap here. */
+  .vcc-partners__grid { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
+  .vcc-partners__stack { max-width: none; gap: 28px; }
 
   .vcc-wins { grid-template-columns: repeat(2, 1fr); }
 }
@@ -790,8 +819,7 @@ body:has(.vcc-page) {
   /* Two portrait clips still read well side by side on a phone; the landscape
      pair stacks, since two 16:9 boxes at half a phone width are unwatchable. */
   .vcc-body.vcc-partners { padding: 16px 10px 20px; }
-  .vcc-partners__portrait { grid-template-columns: repeat(2, 1fr); column-gap: 10px; }
-  .vcc-partners__landscape { grid-template-columns: 1fr; column-gap: 10px; }
+  .vcc-partners__grid { grid-template-columns: repeat(2, 1fr); column-gap: 10px; }
   .vcc-partner__name { font-size: 16px; line-height: 21px; }
 
   .vcc-wins { grid-template-columns: 1fr; }

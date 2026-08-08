@@ -43,11 +43,9 @@ whole design. Do not round them individually.
 |---|---|
 | Step 1 video | ✅ Live — Vidalytics `1bPO1F19aT_fHl5g` |
 | Step 2 video | ✅ Live — Vidalytics `gdS3zkX56PY3q7QX` |
-| Step 3 FAQ videos | ❌ 12 Vidalytics embeds |
-| Step 4 reviews video | ❌ 1 Vidalytics embed |
-| Bonus #1 testimonials | ❌ 10 Vidalytics embeds |
-| Bonus #2 wins posts | ❌ 15 portrait screenshots (3:4) |
-| Reviews CTA URL | ❌ currently `#` |
+| Step 3 FAQ videos | ❌ 10 Vidalytics embeds |
+| Step 4 partner videos | ❌ 10 Vidalytics embeds |
+| Step 5 reviews / written wins | ❌ 15 portrait screenshots (3:4) |
 | Terms / Privacy URLs | ❌ currently `#` |
 
 Every pending slot renders a dashed grey placeholder marked with a `TODO` in

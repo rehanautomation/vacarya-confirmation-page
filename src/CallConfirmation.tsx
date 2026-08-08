@@ -6,18 +6,16 @@ import { useEffect, useRef, type ReactNode } from "react";
 /* -------------------------------------------------------------------------- */
 
 const FAQ_QUESTIONS = [
-  "What is Vacarya?",
-  "What types of results can I get?",
-  "How much capital do I need to start?",
-  "Do I need to buy any property?",
-  "Do I need any experience to do this?",
-  "How much time will this take each week?",
-  "How do I know this will work in my market?",
-  "What if a unit underperforms?",
-  "What if a guest damages the property?",
-  "What if the rules change in my city?",
-  "How much does Vacarya cost?",
-  "What if my partner isn’t aligned?",
+  "How much does each property cost to set up?",
+  "What is my role in the partnership?",
+  "Isn’t Airbnb getting too saturated?",
+  "How do you protect against changes in travel demand?",
+  "Why lease an Airbnb instead of buying the property?",
+  "What happens when the lease ends?",
+  "What about insurance and liability?",
+  "What about Airbnb regulations and city bans?",
+  "How much time does this take each week?",
+  "How do I know my property will actually get booked?",
 ] as const;
 
 /**
@@ -118,8 +116,6 @@ const LEGAL_DISCLAIMER =
 /* Pending inputs — see design_handoff README "Assets" table                    */
 /* -------------------------------------------------------------------------- */
 
-/** TODO: real reviews page URL (Trustpilot or equivalent). Required before launch. */
-const REVIEWS_URL = "#";
 /** TODO: real Terms URL. */
 const TERMS_URL = "#";
 /** TODO: real Privacy URL. */
@@ -304,28 +300,26 @@ export default function CallConfirmationPage() {
                   strokeLinejoin="round"
                 />
               </svg>
-              Congrats! Your Call Is Booked!
+              Your Call Is Confirmed!
             </h1>
             <p className="vcc-hero__body">
-              We look forward to speaking with you during your scheduled time! Please be in a quiet
-              spot where we can speak about your goals.
+              We look forward to speaking with you during your scheduled time!
             </p>
             <p className="vcc-hero__body vcc-hero__body--tight">
-              <strong>
-                We will not take calls when you&rsquo;re on the go or can&rsquo;t devote your full
-                attention.
-              </strong>{" "}
-              <span className="vcc-underline">
-                This call may decide the fate of your financial future, please treat it that way
-              </span>
-              .
+              Before your call, make sure you watch the videos on this page. They&rsquo;re an
+              important part of the process and will give you the context you need, so when we speak
+              we can build on that and get into how this would actually apply to you.
+            </p>
+            <p className="vcc-hero__body vcc-hero__body--tight">
+              Expect a quick call or text from +1 (302) 566 0034 prior to your scheduled call from a
+              member of our advisory team.
             </p>
           </header>
 
           <div className="vcc-hero-spacer" />
 
           {/* Step 1 */}
-          <SectionCard title="Step 1: Watch This Video Now" bodyClassName="vcc-body vcc-body--wide">
+          <SectionCard title="Step 1: Call Confirmation" bodyClassName="vcc-body vcc-body--wide">
             <VidalyticsVideo videoId="1bPO1F19aT_fHl5g" eager />
             <VideoCaption>
               Please send this page to your spouse right now. It has important information they need
@@ -336,10 +330,7 @@ export default function CallConfirmationPage() {
           <Divider />
 
           {/* Step 2 */}
-          <SectionCard
-            title="Step 2: Accept The Calendar Invite"
-            bodyClassName="vcc-body vcc-body--wide"
-          >
+          <SectionCard title="Step 2: How It All Works" bodyClassName="vcc-body vcc-body--wide">
             <VidalyticsVideo videoId="gdS3zkX56PY3q7QX" />
             <VideoCaption>
               Make sure your partner is available for this time. It&rsquo;s very hard to build a
@@ -367,25 +358,8 @@ export default function CallConfirmationPage() {
           <Divider />
 
           {/* Step 4 */}
-          <SectionCard title="Step 4: Read Our Reviews" bodyClassName="vcc-body vcc-body--reviews">
-            {/* TODO: replace with <VidalyticsVideo videoId="..." /> once the embed lands. */}
-            <Placeholder
-              label={"Video placeholder — Reviews"}
-              note={"Vidalytics embed · 16:9 · renders 1024 × 576 px at 1920 viewport"}
-            />
-            <a className="vcc-cta" href={REVIEWS_URL} target="_blank" rel="noopener">
-              <span className="vcc-cta__line1">Click Here To Read Our Unbiased Reviews</span>
-              <span className="vcc-cta__line2">
-                We cannot delete or hide reviews, ensuring transparent, unfiltered feedback
-              </span>
-            </a>
-          </SectionCard>
-
-          <Divider />
-
-          {/* Bonus #1 */}
           <SectionCard
-            title="Bonus #1: Listen To What Real Clients Have To Say"
+            title="Step 4: Hear From Our Partners"
             bodyClassName="vcc-body vcc-testimonials"
           >
             {TESTIMONIALS.map((testimonial, index) => (
@@ -418,9 +392,9 @@ export default function CallConfirmationPage() {
 
           <Divider />
 
-          {/* Bonus #2 */}
+          {/* Step 5 */}
           <SectionCard
-            title="Bonus #2: Read Wins Posts From Our Client Community"
+            title="Step 5: Reviews & Written Wins"
             bodyClassName="vcc-body vcc-wins"
           >
             {Array.from({ length: WINS_COUNT }, (_, index) => (
@@ -564,7 +538,6 @@ body:has(.vcc-page) {
 
 .vcc-body { padding: 20.7px 11.3px 22.7px; }
 .vcc-body--wide { padding: 20.7px 35.3px 27.3px; }
-.vcc-body--reviews { padding: 20.7px 35.3px 20px; }
 
 /* BudgetDog renders the between-card divider as a literal "|" glyph, not a
    drawn box: Barlow Semi Condensed 32px/41.6px, weight 500, 15% grey. */
@@ -679,50 +652,7 @@ body:has(.vcc-page) {
   color: #000000;
 }
 
-/* Step 4 — reviews CTA ---------------------------------------------------- */
-
-/* BudgetDog: #00b67a, radius 5px, padding 16px 20px 18px. */
-.vcc-cta {
-  display: block;
-  margin: 20.7px 0 0;
-  background: #00b67a;
-  color: #ffffff;
-  text-decoration: none;
-  text-align: center;
-  padding: 16px 20px 18px;
-  border-radius: 5px;
-  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
-  transition: background-color 0.15s ease;
-}
-
-.vcc-page .vcc-cta:hover { background: #00a06c; color: #ffffff; }
-
-/* BudgetDog: line 1 is 28px/700, line 2 is 15px/400 — both plain white. */
-.vcc-cta__line1 {
-  display: block;
-  font-weight: 700;
-  font-size: 28px;
-  line-height: normal;
-  text-transform: uppercase;
-  color: #ffffff;
-}
-
-/* Their subline is NOT Barlow — it falls through to the system sans stack, which
-   is why it reads wider and plainer than the condensed line above it. The softer
-   grey-white comes from opacity 0.8 over the green, not a different hex. */
-.vcc-cta__line2 {
-  display: block;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: normal;
-  text-transform: uppercase;
-  color: #ffffff;
-  opacity: 0.8;
-}
-
-/* Bonus #1 — testimonials ------------------------------------------------- */
+/* Step 4 — testimonials ------------------------------------------------- */
 
 /*
  * Each testimonial is one DOM unit (quote + its own video) so the pair stays
@@ -774,7 +704,7 @@ body:has(.vcc-page) {
 .vcc-testimonial__video { width: auto; margin: 2.7px 10px 67.3px; }
 .vcc-testimonial--last .vcc-testimonial__video { margin: 2.7px 10px 0; }
 
-/* Bonus #2 — wins grid ---------------------------------------------------- */
+/* Step 5 — reviews & written wins grid ---------------------------------------------------- */
 
 .vcc-wins {
   display: grid;
@@ -879,14 +809,10 @@ body:has(.vcc-page) {
   .vcc-card__header { font-size: 22px; line-height: 28.6px; padding: 16px 12px; }
 
   .vcc-body { padding: 16px 10px 18px; }
-  .vcc-body--wide,
-  .vcc-body--reviews { padding: 16px 12px 20px; }
+  .vcc-body--wide { padding: 16px 12px 20px; }
   /* Their FAQ video is 370px at 10px inset in a 390px card. */
   .vcc-body.vcc-faq { padding: 16px 10px 18px; }
 
-  .vcc-cta { padding: 14px 14px 16px; }
-  .vcc-cta__line1 { font-size: 20px; }
-  .vcc-cta__line2 { font-size: 13px; }
 
   .vcc-wins { grid-template-columns: 1fr; }
 

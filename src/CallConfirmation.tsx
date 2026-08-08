@@ -73,15 +73,20 @@ const PARTNERS_LANDSCAPE: (Partner & { ratio: number })[] = [
 const PORTRAIT_RATIO = 177.78;
 
 /**
- * Bonus card. Two landscape clips, stacked rather than side by side so each gets
- * the card's full width.
+ * Bonus card. Two landscape clips, stacked so each gets a full-width slot.
  *
- * TODO: Patricia's location is taken from the "CA" on her Trustpilot review,
- * which is ambiguous — confirm whether that is Canada or California.
+ * These carry a headline rather than the name-and-location label used in Step 4:
+ * a case study is sold by its result, and the person is named inside the line.
  */
-const CASE_STUDIES: Partner[] = [
-  { name: "Kajana D.", location: "Mississauga, ON", videoId: "r8cg1w54h5ld2Yqh" },
-  { name: "Patricia", location: "Canada", videoId: "Giqo4Xgx53dNyznB" },
+const CASE_STUDIES: { title: string; videoId: string }[] = [
+  {
+    title: "Two Years Ago, Kajana Was a Let Go. Today, She Runs 21 Airbnb Properties.",
+    videoId: "r8cg1w54h5ld2Yqh",
+  },
+  {
+    title: "How We Took Patricia From 1 to 13 Properties in Under One Year",
+    videoId: "Giqo4Xgx53dNyznB",
+  },
 ];
 
 /**
@@ -182,8 +187,7 @@ function useReviewColumnCount() {
 /* Pending inputs — see design_handoff README "Assets" table                    */
 /* -------------------------------------------------------------------------- */
 
-/** TODO: real client agreement PDF. */
-const AGREEMENT_URL = "#";
+const AGREEMENT_URL = "/Vacarya-Partnership-Agreement.pdf";
 /** TODO: real Terms URL. */
 const TERMS_URL = "#";
 /** TODO: real Privacy URL. */
@@ -508,9 +512,9 @@ export default function CallConfirmationPage() {
             title="Bonus: Recent Case Studies"
             bodyClassName="vcc-body vcc-case-studies"
           >
-            {CASE_STUDIES.map(({ name, location, videoId }) => (
+            {CASE_STUDIES.map(({ title, videoId }) => (
               <div key={videoId} className="vcc-case-study">
-                <PartnerName name={name} location={location} />
+                <h3 className="vcc-case-study__title">{title}</h3>
                 <VidalyticsVideo videoId={videoId} />
               </div>
             ))}
@@ -533,7 +537,9 @@ export default function CallConfirmationPage() {
               to expect. If you have any questions, bring them to the call and we can walk through
               them together.
             </p>
-            <a className="vcc-agreement__cta" href={AGREEMENT_URL} target="_blank" rel="noopener">
+            {/* `download` rather than target=_blank: the PDF is same-origin, so
+                the browser saves it straight away instead of opening a viewer. */}
+            <a className="vcc-agreement__cta" href={AGREEMENT_URL} download>
               Review Partnership Agreement
             </a>
           </div>
@@ -931,6 +937,19 @@ body:has(.vcc-page) {
  */
 .vcc-case-study { width: 100%; max-width: 880px; margin: 0 auto; }
 
+/* Montserrat 800 keeps it in the same family as the partner labels, but upright
+   and a step larger, because this is a headline rather than an attribution. */
+.vcc-case-study__title {
+  margin: 0 0 12px;
+  font-family: 'Montserrat', Helvetica, Arial, sans-serif;
+  font-weight: 800;
+  font-size: 23px;
+  line-height: 30px;
+  text-align: center;
+  text-wrap: balance;
+  color: #000000;
+}
+
 .vcc-case-study .vcc-video {
   border: 1px solid #e6e6e6;
   border-radius: 4px;
@@ -1146,6 +1165,7 @@ body:has(.vcc-page) {
 
   /* Mobile sizing is already right — only the gaps move. */
   .vcc-body.vcc-case-studies { padding: 20px 10px 24px; gap: 26px; }
+  .vcc-case-study__title { font-size: 18px; line-height: 24px; }
 
   .vcc-agreement { padding: 40px 10px; margin-top: 32px; }
   .vcc-agreement__panel { padding: 28px 20px 32px; border-radius: 12px; }

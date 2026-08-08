@@ -52,7 +52,7 @@ const PARTNERS_PORTRAIT: Partner[] = [
   { name: "Jason L.", location: "Toronto, ON", videoId: "Q7FZIMLXMLWHNdDk" },
   { name: "Kajana D.", location: "Mississauga, ON", videoId: "YMTcLkxOfEPogHig" },
   { name: "Dylan M.", location: "Ancaster, ON", videoId: "C873MB3yzcU4eiHP" },
-  { name: "Trevor J.", location: "Toronto", videoId: "WkyXHrLIcfaeY4yr" },
+  { name: "Trevor J.", location: "Toronto, ON", videoId: "WkyXHrLIcfaeY4yr" },
   { name: "Trevor H.", location: "Rockvale, TN", videoId: "pJPnsekIVIAUwxYD" },
 ];
 

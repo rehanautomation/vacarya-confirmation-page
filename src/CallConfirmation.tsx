@@ -126,7 +126,7 @@ const EARNINGS_COUNT = 28;
 const EARNING_WIDTH = 272;
 const EARNING_HEIGHT = 444;
 
-const EARNINGS = Array.from({ length: EARNINGS_COUNT }, (_, i) => `/revenue/earning-${i + 1}.png`);
+const EARNINGS = Array.from({ length: EARNINGS_COUNT }, (_, i) => `/revenue/earning-${i + 1}.webp`);
 
 const REVIEW_COLUMNS_DESKTOP = 3;
 const REVIEW_COLUMNS_MOBILE = 2;
@@ -189,9 +189,9 @@ function useReviewColumnCount() {
 
 const AGREEMENT_URL = "/Vacarya-Partnership-Agreement.pdf";
 /** TODO: real Terms URL. */
-const TERMS_URL = "#";
+const TERMS_URL = "https://hostvacarya.com/termsofservice/";
 /** TODO: real Privacy URL. */
-const PRIVACY_URL = "#";
+const PRIVACY_URL = "https://hostvacarya.com/privacy/";
 
 /* -------------------------------------------------------------------------- */
 /* Video                                                                       */
@@ -550,10 +550,10 @@ export default function CallConfirmationPage() {
           <div className="vcc-footer__inner">
             <img
               className="vcc-footer__logo"
-              src="/Vacarya-White-e1762058976289.png"
+              src="/vacarya-logo.webp"
               alt="Vacarya"
-              width={876}
-              height={751}
+              width={260}
+              height={223}
             />
             <p className="vcc-footer__links">
               <a href={TERMS_URL}>TERMS</a> | <a href={PRIVACY_URL}>PRIVACY</a>

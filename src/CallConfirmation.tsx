@@ -5,17 +5,21 @@ import { useEffect, useRef, type ReactNode } from "react";
 /* Content                                                                     */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Order here is the on-page arrangement — five rows of two, reading across.
+ * Do not reorder: the questions were paired deliberately.
+ */
 const FAQ_QUESTIONS = [
-  "How much does each property cost to set up?",
-  "What is my role in the partnership?",
-  "Isn’t Airbnb getting too saturated?",
-  "How do you protect against demand changes?",
-  "Why lease instead of buying the property?",
-  "What happens when the lease ends?",
-  "What about insurance and liability?",
-  "What about Airbnb regulations and city bans?",
-  "How much time does this take each week?",
-  "How do I know my property will get booked?",
+  { question: "How much does each property cost to set up?", videoId: "t7pTqSqh8LgrPqod" },
+  { question: "What is my role in the partnership?", videoId: "Jw0muBm0ZOlXzSrO" },
+  { question: "Isn’t Airbnb getting too saturated?", videoId: "KDyAD0prpzmirbAs" },
+  { question: "How do you protect against demand changes?", videoId: "6YvUtIN_HUohkWmq" },
+  { question: "Why lease instead of buying the property?", videoId: "XC9gtxyFKgZsqtnV" },
+  { question: "What happens when the lease ends?", videoId: "jcz7ZkI_OEg9Mhq2" },
+  { question: "What about insurance and liability?", videoId: "Ff0GWu5njsWnobjl" },
+  { question: "What about Airbnb regulations and city bans?", videoId: "myLcwKZgT5A_Vovr" },
+  { question: "How much time does this take each week?", videoId: "p93i6145A9ThBsDv" },
+  { question: "How do I know my property will get booked?", videoId: "d7XTmUEtYMBY2e2Q" },
 ] as const;
 
 /**
@@ -274,15 +278,10 @@ export default function CallConfirmationPage() {
 
           {/* Step 3 */}
           <SectionCard title="Step 3: Get Your Questions Answered" bodyClassName="vcc-body vcc-faq">
-            {FAQ_QUESTIONS.map((question) => (
-              <div key={question} className="vcc-faq__item">
+            {FAQ_QUESTIONS.map(({ question, videoId }) => (
+              <div key={videoId} className="vcc-faq__item">
                 <h3 className="vcc-faq__question">{question}</h3>
-                {/* TODO: replace with <VidalyticsVideo videoId="..." /> once the embed lands. */}
-                <Placeholder
-                  label={`Video placeholder — “${question}”`}
-                  note={"16:9 · 536 × 302 px at 1920 viewport"}
-                  size="sm"
-                />
+                <VidalyticsVideo videoId={videoId} />
               </div>
             ))}
           </SectionCard>

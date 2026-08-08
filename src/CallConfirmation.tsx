@@ -96,6 +96,21 @@ const REVIEWS: Review[] = [
   { src: "/reviews/review-10.webp", width: 800, height: 389 },
 ];
 
+/**
+ * Revenue screenshots, revealed inside the same card when the reader asks for
+ * them. All 28 are identical at 272x444, so a plain grid is right here — equal
+ * heights mean no dead space, and none of the masonry packing above is needed.
+ *
+ * 28 divides evenly by 4 and by 2, so neither breakpoint leaves an orphan row.
+ * Four columns also renders each one 261px wide against a 272px source, just
+ * under native size, so they stay sharp rather than being upscaled.
+ */
+const EARNINGS_COUNT = 28;
+const EARNING_WIDTH = 272;
+const EARNING_HEIGHT = 444;
+
+const EARNINGS = Array.from({ length: EARNINGS_COUNT }, (_, i) => `/revenue/earning-${i + 1}.png`);
+
 const REVIEW_COLUMNS_DESKTOP = 3;
 const REVIEW_COLUMNS_MOBILE = 2;
 const REVIEW_MOBILE_QUERY = "(max-width: 767px)";
@@ -304,6 +319,7 @@ function VideoCaption({ children }: { children: ReactNode }) {
 
 export default function CallConfirmationPage() {
   const reviewColumns = useReviewColumnCount();
+  const [showEarnings, setShowEarnings] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -421,24 +437,54 @@ export default function CallConfirmationPage() {
           {/* Step 5 */}
           <SectionCard
             title="Step 5: Reviews & Written Wins"
-            bodyClassName="vcc-body vcc-reviews"
+            bodyClassName="vcc-body vcc-step5"
           >
-            {packColumns(REVIEWS, reviewColumns).map((column, index) => (
-              <div key={index} className="vcc-reviews__column">
-                {column.map((review) => (
+            <div className="vcc-reviews">
+              {packColumns(REVIEWS, reviewColumns).map((column, index) => (
+                <div key={index} className="vcc-reviews__column">
+                  {column.map((review) => (
+                    <img
+                      key={review.src}
+                      className="vcc-review"
+                      src={review.src}
+                      width={review.width}
+                      height={review.height}
+                      alt="Client review"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* The button is replaced by the screenshots rather than kept above
+                them, so the expanded card simply ends after the last image. */}
+            {showEarnings ? (
+              <div className="vcc-earnings">
+                {EARNINGS.map((src) => (
                   <img
-                    key={review.src}
-                    className="vcc-review"
-                    src={review.src}
-                    width={review.width}
-                    height={review.height}
-                    alt="Client review"
+                    key={src}
+                    className="vcc-earning"
+                    src={src}
+                    width={EARNING_WIDTH}
+                    height={EARNING_HEIGHT}
+                    alt="Client revenue"
                     loading="lazy"
                     decoding="async"
                   />
                 ))}
               </div>
-            ))}
+            ) : (
+              <button
+                type="button"
+                className="vcc-more"
+                onClick={() => setShowEarnings(true)}
+                aria-expanded={false}
+              >
+                More Client Numbers
+              </button>
+            )}
           </SectionCard>
         </div>
 
@@ -732,11 +778,16 @@ body:has(.vcc-page) {
  *
  * Gaps match the partner grid above (15px) so the two sections read as one page.
  */
+/* Padding lives on the card body so the masonry, the button and the revenue
+   grid all share one set of edges. */
+.vcc-step5 {
+  padding: 38px 15px 24px;
+}
+
 .vcc-reviews {
   display: flex;
   align-items: flex-start;
   gap: 15px;
-  padding: 38px 15px 24px;
 }
 
 .vcc-reviews__column {
@@ -749,6 +800,57 @@ body:has(.vcc-page) {
 
 /* The screenshots are mostly white, so they need an edge against the white card. */
 .vcc-review {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+}
+
+/*
+ * Reveal control. Takes the section header's treatment — Barlow Semi Condensed,
+ * uppercase, black on brand blue — so it reads as part of the page rather than a
+ * bolted-on control, at the CTA's 5px radius rather than the card's 10px.
+ *
+ * Exactly one review column wide and centred, which on the three-column desktop
+ * grid places it under the middle column. Derived from the same track maths as
+ * the grid, so it follows if the gap or padding ever changes.
+ */
+.vcc-more {
+  display: block;
+  width: calc((100% - 30px) / 3);
+  margin: 30px auto 6px;
+  padding: 16px 20px 18px;
+  border: 0;
+  border-radius: 5px;
+  background: #00ABE5;
+  color: #000000;
+  font-family: 'Barlow Semi Condensed', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.vcc-more:hover { background: #0090c2; }
+.vcc-more:focus-visible { outline: 3px solid #000000; outline-offset: 3px; }
+
+/*
+ * All 28 revenue screenshots are the same 272x444, so a plain grid suits them —
+ * equal heights leave no dead space. Four columns divides 28 evenly and renders
+ * each 261px against a 272px source, just under native size.
+ */
+.vcc-earnings {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.vcc-earning {
   display: block;
   width: 100%;
   height: auto;
@@ -836,8 +938,14 @@ body:has(.vcc-page) {
 
   /* Two columns here comes from packColumns, not CSS — this only tightens the
      gaps to match the rest of the page at this width. */
-  .vcc-body.vcc-reviews { padding: 24px 15px 20px; gap: 12px; }
+  .vcc-body.vcc-step5 { padding: 24px 15px 20px; }
+  .vcc-reviews { gap: 12px; }
   .vcc-reviews__column { gap: 12px; }
+
+  /* Two columns here, so one column wide would leave the button off-centre —
+     it takes a comfortable share of the width instead. */
+  .vcc-more { width: 100%; max-width: 340px; font-size: 21px; }
+  .vcc-earnings { grid-template-columns: repeat(2, 1fr); gap: 12px; }
 }
 
 @media (max-width: 480px) {
@@ -867,8 +975,11 @@ body:has(.vcc-page) {
   .vcc-partners__grid { grid-template-columns: repeat(2, 1fr); column-gap: 10px; }
   .vcc-partner__name { font-size: 16px; line-height: 21px; }
 
-  .vcc-body.vcc-reviews { padding: 16px 10px 20px; gap: 10px; }
+  .vcc-body.vcc-step5 { padding: 16px 10px 20px; }
+  .vcc-reviews { gap: 10px; }
   .vcc-reviews__column { gap: 10px; }
+  .vcc-more { font-size: 19px; padding: 14px 14px 16px; }
+  .vcc-earnings { gap: 10px; }
 
 
   .vcc-footer__inner { padding: 0 10px; }

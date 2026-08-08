@@ -9,13 +9,13 @@ const FAQ_QUESTIONS = [
   "How much does each property cost to set up?",
   "What is my role in the partnership?",
   "Isn’t Airbnb getting too saturated?",
-  "How do you protect against changes in travel demand?",
-  "Why lease an Airbnb instead of buying the property?",
+  "How do you protect against demand changes?",
+  "Why lease instead of buying the property?",
   "What happens when the lease ends?",
   "What about insurance and liability?",
   "What about Airbnb regulations and city bans?",
   "How much time does this take each week?",
-  "How do I know my property will actually get booked?",
+  "How do I know my property will get booked?",
 ] as const;
 
 /**
@@ -109,8 +109,6 @@ const TESTIMONIALS: Testimonial[] = [
 
 const WINS_COUNT = 15;
 
-const LEGAL_DISCLAIMER =
-  "DISCLAIMER: Please understand results are not typical. Your results will vary and depend on many factors including but not limited to your capital, your market, your timing, your background, experience, and work ethic. All business entails risk as well as taking regular and consistent effort and action. Vacarya can not and does not make any guarantees about your ability to secure leases, generate bookings, achieve any profit margin, or earn any money with our ideas, information, tools, or strategies. Nothing on this page, any of our websites, or any of our content or curriculum is a promise or guarantee of results or future earnings, and we do not offer any legal, medical, tax, immigration or other professional advice. Any financial numbers referenced here, or on any of our sites, are illustrative of concepts only and should not be considered average earnings, exact earnings, or promises for actual or future performance. Short-term rental rules vary by city, state, province, and building, and are subject to change. Use caution and always consult your accountant, lawyer or professional advisor before acting on this or any information related to a lifestyle change or your business or finances. You alone are responsible and accountable for your decisions, actions and results in life, and by your registration here you agree not to attempt to hold us liable for your decisions, actions or results, at any time, under any circumstance.";
 
 /* -------------------------------------------------------------------------- */
 /* Pending inputs — see design_handoff README "Assets" table                    */
@@ -419,7 +417,6 @@ export default function CallConfirmationPage() {
             <p className="vcc-footer__copy">
               All rights reserved 2026. This program is brought to you and copyrighted by Vacarya LP
             </p>
-            <p className="vcc-footer__legal">{LEGAL_DISCLAIMER}</p>
           </div>
         </footer>
       </main>
@@ -754,14 +751,6 @@ body:has(.vcc-page) {
   color: rgba(255, 255, 255, 0.42);
 }
 
-.vcc-footer__legal {
-  margin: 21.3px 0 0;
-  font-size: 16px;
-  line-height: normal;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.42);
-  text-align: center;
-}
 
 /* Responsive --------------------------------------------------------------
  * Measured from BudgetDog at 390 / 640 / 767 / 768. They use two breakpoints:
@@ -822,7 +811,6 @@ body:has(.vcc-page) {
 
   .vcc-footer__inner { padding: 0 10px; }
   .vcc-footer__links { font-size: 18px; }
-  .vcc-footer__copy,
-  .vcc-footer__legal { font-size: 14px; }
+  .vcc-footer__copy { font-size: 14px; }
 }
 `;

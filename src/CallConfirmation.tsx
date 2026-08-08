@@ -19,92 +19,26 @@ const FAQ_QUESTIONS = [
 ] as const;
 
 /**
- * `before` / `highlight` / `after` split the quote so the metric can carry the
- * blue italic emphasis.
- *
- * Punctuation matches BudgetDog exactly: straight double quotes (U+0022) around
- * the quotation, curly apostrophes (U+2019) inside contractions. Do not "fix"
- * the straight quotes to typographic ones — theirs are straight.
+ * Quotes were removed at the client's request — Step 4 now shows each partner's
+ * name and location above their video, nothing else. `attribution` is what
+ * renders; `name` only labels the pending video placeholder.
  */
 type Testimonial = {
-  before: string;
-  highlight: string;
-  after: string;
   attribution: string;
   name: string;
 };
 
 const TESTIMONIALS: Testimonial[] = [
-  {
-    before: "\"I’m at ",
-    highlight: "25 units doing around $90,000 a month",
-    after: ". My first one was live in 13 days.\"",
-    attribution: "- Josh C., Hamilton, ON",
-    name: "Josh C.",
-  },
-  {
-    before: "\"",
-    highlight: "Nine large units doing about $70,000 a month.",
-    after: " Ten days from signing to live.\"",
-    attribution: "- Rob V., Toronto, ON",
-    name: "Rob V.",
-  },
-  {
-    before: "\"",
-    highlight: "23 units, around $63,000 a month",
-    after: ", and the business qualified me for my E-2 visa.\"",
-    attribution: "- Andy D., Nova Scotia",
-    name: "Andy D.",
-  },
-  {
-    before: "\"",
-    highlight: "Three units, roughly $10,000 a month",
-    after: ", and I was live in two weeks.\"",
-    attribution: "- Fasi K., Brampton, ON",
-    name: "Fasi K.",
-  },
-  {
-    before: "\"Five days from handover to live. ",
-    highlight: "I’m at nine units now, about $24,000 a month.",
-    after: "\"",
-    attribution: "- Jason L., Toronto, ON",
-    name: "Jason L.",
-  },
-  {
-    before: "\"I started with two large units. ",
-    highlight: "They’re doing around $15,000 a month between them.",
-    after: "\"",
-    attribution: "- Dennis L., Cookstown, ON",
-    name: "Dennis L.",
-  },
-  {
-    before: "\"I came in with one unit and no idea how far it could go. ",
-    highlight: "We’re at 30 units now, and it’s a seven-figure business.",
-    after: "\"",
-    attribution: "- Dylan M., Ancaster, ON",
-    name: "Dylan M.",
-  },
-  {
-    before: "\"The turnaround time completely exceeded what I expected. ",
-    highlight: "Eight units, live in 15 days.",
-    after: "\"",
-    attribution: "- Kajana D., Mississauga, ON",
-    name: "Kajana D.",
-  },
-  {
-    before: "\"The setup and the management were effortless. ",
-    highlight: "They handled all of it",
-    after: " and I just watched it go live.\"",
-    attribution: "- Trevor H., Rockvale, TN",
-    name: "Trevor H.",
-  },
-  {
-    before: "\"",
-    highlight: "We’re holding a 25-30% profit margin",
-    after: ", even in the slow season.\"",
-    attribution: "- Jessica & James, St. Petersburg, FL",
-    name: "Jessica & James",
-  },
+  { attribution: "- Josh C., Hamilton, ON", name: "Josh C." },
+  { attribution: "- Rob V., Toronto, ON", name: "Rob V." },
+  { attribution: "- Andy D., Nova Scotia", name: "Andy D." },
+  { attribution: "- Fasi K., Brampton, ON", name: "Fasi K." },
+  { attribution: "- Jason L., Toronto, ON", name: "Jason L." },
+  { attribution: "- Dennis L., Cookstown, ON", name: "Dennis L." },
+  { attribution: "- Dylan M., Ancaster, ON", name: "Dylan M." },
+  { attribution: "- Kajana D., Mississauga, ON", name: "Kajana D." },
+  { attribution: "- Trevor H., Rockvale, TN", name: "Trevor H." },
+  { attribution: "- Jessica & James, St. Petersburg, FL", name: "Jessica & James" },
 ];
 
 const WINS_COUNT = 15;
@@ -371,10 +305,6 @@ export default function CallConfirmationPage() {
                   .join(" ")}
               >
                 <p className="vcc-testimonial__quote">
-                  {testimonial.before}
-                  <span className="vcc-metric">{testimonial.highlight}</span>
-                  {testimonial.after}
-                  <br />
                   <span className="vcc-testimonial__attribution">{testimonial.attribution}</span>
                 </p>
                 {/* TODO: replace with <VidalyticsVideo videoId="..." /> once the embed lands. */}
@@ -411,6 +341,13 @@ export default function CallConfirmationPage() {
         {/* Footer */}
         <footer className="vcc-footer">
           <div className="vcc-footer__inner">
+            <img
+              className="vcc-footer__logo"
+              src="/Vacarya-White-e1762058976289.png"
+              alt="Vacarya"
+              width={876}
+              height={751}
+            />
             <p className="vcc-footer__links">
               <a href={TERMS_URL}>TERMS</a> | <a href={PRIVACY_URL}>PRIVACY</a>
             </p>
@@ -687,7 +624,6 @@ body:has(.vcc-page) {
   color: #000000;
 }
 
-.vcc-metric { color: #00ABE5; font-style: italic; }
 .vcc-testimonial__attribution { font-style: italic; }
 
 /*
@@ -730,6 +666,15 @@ body:has(.vcc-page) {
   padding: 0 15px;
   text-align: center;
   box-sizing: border-box;
+}
+
+/* Sized by height so the near-square mark (876×751) stays proportionate above
+   the links. Sits on the black band, which the PNG's transparency relies on. */
+.vcc-footer__logo {
+  display: block;
+  height: 110px;
+  width: auto;
+  margin: 0 auto 18px;
 }
 
 .vcc-footer__links {
@@ -810,6 +755,7 @@ body:has(.vcc-page) {
   .vcc-placeholder--xs .vcc-placeholder__label { font-size: 12px; }
 
   .vcc-footer__inner { padding: 0 10px; }
+  .vcc-footer__logo { height: 84px; margin-bottom: 14px; }
   .vcc-footer__links { font-size: 18px; }
   .vcc-footer__copy { font-size: 14px; }
 }

@@ -148,8 +148,8 @@ const REVIEWS: Review[] = [
   { src: "/reviews/review-8.webp", width: 800, height: 376 },
   // Greg — support and group calls only.
   { src: "/reviews/review-16.webp", width: 800, height: 314 },
-  // H Quinn — warm but entirely general. Also the one low-resolution capture.
-  { src: "/reviews/review-19.webp", width: 553, height: 330 },
+  // H Quinn — warm but entirely general.
+  { src: "/reviews/review-19.webp", width: 800, height: 477 },
   // Fast Moving Homes — two lines, no specifics.
   { src: "/reviews/review-6.webp", width: 800, height: 276 },
 ];

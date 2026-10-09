@@ -80,7 +80,7 @@ const PORTRAIT_RATIO = 177.78;
  */
 const CASE_STUDIES: { title: string; videoId: string }[] = [
   {
-    title: "Two Years Ago, Kajana Was a Let Go. Today, She Runs 21 Airbnb Properties.",
+    title: "Two Years Ago, Kajana Was Let Go. Today, She Runs 21 Airbnb Properties.",
     videoId: "r8cg1w54h5ld2Yqh",
   },
   {
@@ -90,10 +90,21 @@ const CASE_STUDIES: { title: string; videoId: string }[] = [
 ];
 
 /**
- * Client review screenshots, Step 5. Sizes vary widely — the set runs from 0.35
- * to 1.39 in height-to-width — so they are laid out as a masonry rather than a
- * grid: a grid sizes every row to its tallest item and leaves dead space under
- * the shorter ones.
+ * Client review screenshots, Step 5.
+ *
+ * Order is deliberate and is the ranking: most persuasive to a reader who has
+ * booked but not committed, first. The ranking weighs, in order, a concrete
+ * number of units or a before/after ("1 unit to 13"), a named objection the
+ * writer had and got past, operational detail only a real partner would know,
+ * and length. Generic praise with no number ranks last however warm it is.
+ *
+ * The packer below fills columns in this order, so the top of the three desktop
+ * columns is ranks 1-3 and nothing strong is buried at the bottom of the card.
+ * Reordering this array is all it takes to re-rank them.
+ *
+ * Sizes vary widely — the set runs from 0.35 to 2.54 in height-to-width — so they
+ * are laid out as a masonry rather than a grid: a grid sizes every row to its
+ * tallest item and leaves dead space under the shorter ones.
  *
  * Dimensions are the real pixel sizes of the files and are set on each <img> so
  * the browser reserves the correct space and nothing shifts while they load.
@@ -101,16 +112,47 @@ const CASE_STUDIES: { title: string; videoId: string }[] = [
 type Review = { src: string; width: number; height: number };
 
 const REVIEWS: Review[] = [
-  { src: "/reviews/review-1.webp", width: 800, height: 506 },
-  { src: "/reviews/review-2.webp", width: 800, height: 997 },
-  { src: "/reviews/review-3.webp", width: 800, height: 1114 },
+  // Devang — 4 units since 2024, multiple five-figure months, and the only one
+  // that names the overwhelm a prospect feels and then answers it.
+  { src: "/reviews/review-20.webp", width: 786, height: 1999 },
+  // Andy — 25 units, plus an E-2 visa out of the process.
+  { src: "/reviews/review-14.webp", width: 800, height: 348 },
+  // Patricia — 1 unit to 13 in under a year.
   { src: "/reviews/review-4.webp", width: 800, height: 441 },
-  { src: "/reviews/review-5.webp", width: 800, height: 336 },
-  { src: "/reviews/review-6.webp", width: 800, height: 276 },
-  { src: "/reviews/review-7.webp", width: 800, height: 399 },
-  { src: "/reviews/review-8.webp", width: 800, height: 376 },
+  // Rob — 0 to 15 properties, all run remotely.
+  { src: "/reviews/review-15.webp", width: 800, height: 414 },
+  // John — career investor, moving money out of other holdings to put it here.
+  { src: "/reviews/review-13.webp", width: 800, height: 823 },
+  // Shawn — "on the fence at the beginning", then two US properties.
+  { src: "/reviews/review-2.webp", width: 800, height: 997 },
+  // Kajana — long, specific on the weekly calls and the confidence gained.
+  { src: "/reviews/review-3.webp", width: 800, height: 1114 },
+  // Sajeed — 2 units in St. Louis run from Canada; answers "can I do this remotely".
+  { src: "/reviews/review-12.webp", width: 800, height: 416 },
+  // Mike — 7 units since May.
+  { src: "/reviews/review-11.webp", width: 800, height: 342 },
+  // Fasi — detailed on the process, no numbers.
   { src: "/reviews/review-9.webp", width: 800, height: 597 },
+  // Gaurav — 3 units, early, and candid that it is early. Credible for that.
+  { src: "/reviews/review-17.webp", width: 800, height: 942 },
+  // Aaron — 2 units live as planned; carries Trustpilot's "Unprompted" badge.
+  { src: "/reviews/review-1.webp", width: 800, height: 506 },
+  // Ravi — several US units, launched fast.
+  { src: "/reviews/review-18.webp", width: 800, height: 411 },
+  // Jesenia — "didn't have to lift a finger".
   { src: "/reviews/review-10.webp", width: 800, height: 389 },
+  // Dharmesh — community and growth, no figures.
+  { src: "/reviews/review-7.webp", width: 800, height: 399 },
+  // Rob S. — setup and operations.
+  { src: "/reviews/review-5.webp", width: 800, height: 336 },
+  // Denis — short, no stress, no numbers.
+  { src: "/reviews/review-8.webp", width: 800, height: 376 },
+  // Greg — support and group calls only.
+  { src: "/reviews/review-16.webp", width: 800, height: 314 },
+  // H Quinn — warm but entirely general. Also the one low-resolution capture.
+  { src: "/reviews/review-19.webp", width: 553, height: 330 },
+  // Fast Moving Homes — two lines, no specifics.
+  { src: "/reviews/review-6.webp", width: 800, height: 276 },
 ];
 
 /**
@@ -133,20 +175,20 @@ const REVIEW_COLUMNS_MOBILE = 2;
 const REVIEW_MOBILE_QUERY = "(max-width: 767px)";
 
 /**
- * Packs reviews into balanced columns, placing the tallest first into whichever
- * column is currently shortest.
+ * Fills columns from the ranked order above, always adding the next review to
+ * whichever column is currently shortest.
  *
- * Ordering by height is what makes the columns finish level. Anything that
- * preserves file order — including a plain CSS multi-column flow, which can only
- * break the sequence in place — leaves one column well short of the others with
- * this set, because two images are roughly three times taller than the rest.
+ * This used to sort tallest-first, which balanced the columns beautifully and
+ * threw the ranking away — the longest screenshots led regardless of what they
+ * said. Taking them in rank order instead puts ranks 1-3 at the top of the three
+ * columns, and the shortest-column rule still lands the columns within about a
+ * fifth of a column height of each other across this set.
  */
 function packColumns(items: Review[], columnCount: number): Review[][] {
   const columns: Review[][] = Array.from({ length: columnCount }, () => []);
   const heights: number[] = new Array(columnCount).fill(0);
-  const tallestFirst = [...items].sort((a, b) => b.height / b.width - a.height / a.width);
 
-  for (const item of tallestFirst) {
+  for (const item of items) {
     let shortest = 0;
     for (let i = 1; i < columnCount; i += 1) {
       if (heights[i] < heights[shortest]) shortest = i;
@@ -386,7 +428,7 @@ export default function CallConfirmationPage() {
             </p>
             <p className="vcc-hero__body vcc-hero__body--tight">
               <strong>
-                Expect a quick call or text from +1 (302) 566 0034 prior to your scheduled call from
+                Expect a quick call or text from +1 302-279-2464 prior to your scheduled call from
                 a member of our advisory team.
               </strong>
             </p>
@@ -527,7 +569,7 @@ export default function CallConfirmationPage() {
           thing before the footer reads as a distinct moment rather than a
           seventh card.
         */}
-        <section className="vcc-agreement">
+        <section className="vcc-agreement" id="partnership">
           <div className="vcc-agreement__panel">
             <p className="vcc-agreement__eyebrow">Want to review the agreement before your call?</p>
             <h2 className="vcc-agreement__title">Review the Partnership Agreement</h2>
@@ -973,6 +1015,8 @@ body:has(.vcc-page) {
   background: #041C25;
   padding: 72px 13.3px;
   margin-top: 60px;
+  /* Deep-link target: leaves a sliver of page above the band on a jump. */
+  scroll-margin-top: 20px;
 }
 
 .vcc-agreement__panel {

@@ -23,59 +23,58 @@ const FAQ_QUESTIONS = [
 ] as const;
 
 /**
- * Step 4 shows each partner's name and location above their video, nothing else.
+ * Step 4 shows each partner's name above their video and nothing else. The city
+ * line is gone: it cost a second line on every card and was not something a
+ * viewer weighs. Names are a first name plus a last initial throughout.
  *
- * Ten portrait clips run three across; the two landscape clips stack beside the
- * tenth, filling the row it would otherwise leave half empty.
+ * All 22 clips are portrait and share one 177.78% (9:16) box, so the grid is even
+ * and every row lines up. The two landscape clips this section used to carry, and
+ * the side stack built to hold them, are gone — both were reshot vertical.
  *
- * Every portrait clip is pinned to a single 177.78% (9:16) box even though the
- * source embeds vary between 176.67% and 177.82%. That spread is under 1% — about
- * 2px at this size — and normalising it means all ten align exactly, which the
- * varied values would not.
- *
- * Name and location are stored apart so each renders on its own line, rather
- * than as one string that wraps wherever the column happens to break.
+ * Two embed snippets are in play. The older clips use Vidalytics' self-contained
+ * loader; the newer ones use its player.settings.json form, which fetches the
+ * player config itself and then waits for the player to exist. `loader: "settings"`
+ * marks the latter. Both run on the same page — see loadVidalytics below.
  */
 type Partner = {
   name: string;
-  location: string;
   videoId: string;
+  loader?: "settings";
 };
 
-/** 9:16, three per row on desktop. */
-const PARTNERS_PORTRAIT: Partner[] = [
-  { name: "Josh C.", location: "Hamilton, ON", videoId: "UH3YggU0nB1bDod_" },
-  { name: "Rob V.", location: "Toronto, ON", videoId: "VTab9sdlPcnqYsyw" },
-  { name: "Andy D.", location: "Nova Scotia", videoId: "WoB8QPzALc0OUKH6" },
-  { name: "Fasi K.", location: "Brampton, ON", videoId: "KCxrI1vlcJ71GTP9" },
-  { name: "Dennis L.", location: "Cookstown, ON", videoId: "LUuJ8wfnCQ7QS1d3" },
-  { name: "Jason L.", location: "Toronto, ON", videoId: "Q7FZIMLXMLWHNdDk" },
-  { name: "Kajana D.", location: "Mississauga, ON", videoId: "YMTcLkxOfEPogHig" },
-  { name: "Dylan M.", location: "Ancaster, ON", videoId: "C873MB3yzcU4eiHP" },
-  { name: "Trevor J.", location: "Toronto, ON", videoId: "WkyXHrLIcfaeY4yr" },
-  { name: "Trevor H.", location: "Rockvale, TN", videoId: "pJPnsekIVIAUwxYD" },
+/** The first eleven are in a deliberate order; the rest follow in any order. */
+const PARTNERS: Partner[] = [
+  { name: "Josh C.", videoId: "UH3YggU0nB1bDod_" },
+  { name: "Patricia G.", videoId: "9ZMBSpvLpcRNeL8m", loader: "settings" },
+  { name: "Helen Q.", videoId: "_3LhJcZabSuVtAqn", loader: "settings" },
+  { name: "Rob V.", videoId: "AT3E6HoGHbMxB4ug", loader: "settings" },
+  { name: "Ravi R.", videoId: "d6GhhPiwXRTZIh55", loader: "settings" },
+  { name: "Mike E.", videoId: "S2udtgRr3weGPAMJ", loader: "settings" },
+  { name: "Sajeed A.", videoId: "o9Ho5JnqweHAsKkj", loader: "settings" },
+  { name: "Kevin M.", videoId: "AtKNDCr00S_Yyh0G", loader: "settings" },
+  { name: "John S.", videoId: "TBDybqUkvVpuF5cy", loader: "settings" },
+  { name: "Devang B.", videoId: "BEIWJ7hHIaXtj5E9", loader: "settings" },
+  { name: "Greg L.", videoId: "O6XYSCu2jX0XvhUf", loader: "settings" },
+  { name: "Andy D.", videoId: "WoB8QPzALc0OUKH6" },
+  { name: "Kajana D.", videoId: "YMTcLkxOfEPogHig" },
+  { name: "Fasi K.", videoId: "KCxrI1vlcJ71GTP9" },
+  { name: "Dylan M.", videoId: "C873MB3yzcU4eiHP" },
+  { name: "Jason L.", videoId: "Q7FZIMLXMLWHNdDk" },
+  { name: "Dennis L.", videoId: "LUuJ8wfnCQ7QS1d3" },
+  { name: "Trevor J.", videoId: "WkyXHrLIcfaeY4yr" },
+  { name: "Trevor H.", videoId: "pJPnsekIVIAUwxYD" },
+  { name: "Gaurav D.", videoId: "5KPTZEDzewMmOnXu", loader: "settings" },
+  { name: "Tony G.", videoId: "cWgx4DGVi2lkzUK4", loader: "settings" },
+  { name: "Jessica", videoId: "zx8wRA3vo22fIHNK", loader: "settings" },
 ];
 
-/** Landscape. These stack beside the last portrait clip on desktop, and each
- *  keeps its own true aspect ratio — forcing them to match would letterbox one
- *  or crop the other. */
-const PARTNERS_LANDSCAPE: (Partner & { ratio: number })[] = [
-  { name: "Tony G.", location: "Toronto, ON", videoId: "EiwlSXCbZ9Lko_VD", ratio: 56.25 },
-  {
-    name: "Jessica & James",
-    location: "St. Petersburg, FL",
-    videoId: "RtMzfq3hSiEqkV8f",
-    ratio: 66.67,
-  },
-];
-
-/** 9:16 — every portrait partner clip renders in this box. */
+/** 9:16 — every partner clip renders in this box. */
 const PORTRAIT_RATIO = 177.78;
 
 /**
  * Bonus card. Two landscape clips, stacked so each gets a full-width slot.
  *
- * These carry a headline rather than the name-and-location label used in Step 4:
+ * These carry a headline rather than the bare name used in Step 4:
  * a case study is sold by its result, and the person is named inside the line.
  */
 const CASE_STUDIES: { title: string; videoId: string }[] = [
@@ -242,21 +241,61 @@ const PRIVACY_URL = "https://hostvacarya.com/privacy/";
 const VIDALYTICS_ACCOUNT = "xWCLYwSv";
 
 /**
- * Injects the Vidalytics loader for one player. The loader is global and the
- * player must only be run once per embed id, so a module-level set guards
- * against React strict-mode double effects and hot reloads.
+ * Runs one Vidalytics player. The loader is global and a player must only be run
+ * once per embed id, so a module-level set guards against React strict-mode
+ * double effects and hot reloads.
+ *
+ * Vidalytics issues two different embed snippets and this page carries both.
+ *
+ *   "classic"  — the self-contained loader. It fetches loader.min.js and
+ *                player.min.js itself, then runs the embed.
+ *   "settings" — fetches player.settings.json, hands the result to
+ *                window._vidalytics.embeds[id], then waits for the player class
+ *                to exist and runs the embed against it.
+ *
+ * The second kind never fetches the player: it polls for it once a second and
+ * relies on something else on the page having pulled it in. Step 1's video is
+ * classic and eager, so in practice it always arrives — but a page that lost
+ * every classic embed would leave all 13 of these spinning forever. ensurePlayer
+ * below removes that dependency by loading the two scripts itself, without
+ * running anything, which is safe to do alongside the classic snippet.
  */
 const initializedEmbeds = new Set<string>();
 
-function loadVidalytics(videoId: string) {
-  const embedId = `vidalytics_embed_${videoId}`;
-  if (initializedEmbeds.has(embedId)) return;
-  initializedEmbeds.add(embedId);
+const embedUrl = (videoId: string) =>
+  `https://fast.vidalytics.com/embeds/${VIDALYTICS_ACCOUNT}/${videoId}/`;
 
-  const baseUrl = `https://fast.vidalytics.com/embeds/${VIDALYTICS_ACCOUNT}/${videoId}/`;
+/** Loads loader.min.js then player.min.js, once per page. Resolves when the
+ *  player class is defined. Does not run any embed. */
+let playerLoading: Promise<void> | null = null;
+
+function ensurePlayer(videoId: string): Promise<void> {
+  if (playerLoading) return playerLoading;
+  const base = embedUrl(videoId);
+
+  const addScript = (src: string) =>
+    new Promise<void>((resolve) => {
+      const el = document.createElement("script");
+      el.type = "text/javascript";
+      el.async = true;
+      el.src = src;
+      el.onload = () => resolve();
+      el.onerror = () => resolve();
+      document.head.appendChild(el);
+    });
+
+  playerLoading = addScript(base + "loader.min.js")
+    .then(() => addScript(base + "player.min.js"))
+    .then(() => undefined);
+
+  return playerLoading;
+}
+
+/** The classic snippet, verbatim from the embed code Vidalytics issues. */
+function loadClassic(videoId: string) {
+  const embedId = `vidalytics_embed_${videoId}`;
   const script = document.createElement("script");
   script.type = "text/javascript";
-  // Vidalytics' own loader snippet, verbatim from the embed code.
   script.text = `(function (v, i, d, a, l, y, t, c, s) {
  y='_'+d.toLowerCase();c=d+'L';if(!v[d]){v[d]={};}if(!v[c]){v[c]={};}if(!v[y]){v[y]={};}var vl='Loader',vli=v[y][vl],vsl=v[c][vl + 'Script'],vlf=v[c][vl + 'Loaded'],ve='Embed';
  if (!vsl){vsl=function(u,cb){
@@ -265,8 +304,48 @@ function loadVidalytics(videoId: string) {
   i.getElementsByTagName("head")[0].appendChild(s);
  };}
  vsl(l+'loader.min.js',function(){if(!vli){var vlc=v[c][vl];vli=new vlc();}vli.loadScript(l+'player.min.js',function(){var vec=v[d][ve];t=new vec();t.run(a);});});
-})(window, document, 'Vidalytics', '${embedId}', '${baseUrl}');`;
+})(window, document, 'Vidalytics', '${embedId}', '${embedUrl(videoId)}');`;
   document.body.appendChild(script);
+}
+
+/**
+ * The player.settings.json snippet. The container id is the raw video id here,
+ * not the vidalytics_embed_ prefix the classic snippet uses — that is how
+ * Vidalytics issues it, and the id in the markup has to match.
+ */
+function loadFromSettings(videoId: string) {
+  const w = window as unknown as Record<string, any>;
+  w._vidalytics = w._vidalytics || {};
+  w._vidalytics.embeds = w._vidalytics.embeds || {};
+
+  ensurePlayer(videoId);
+
+  const run = () => {
+    if (w.Vidalytics && w.Vidalytics.Embed) {
+      const embed = new w.Vidalytics.Embed();
+      embed.run(videoId);
+      embed.loadCss();
+    } else {
+      setTimeout(run, 500);
+    }
+  };
+
+  const request = new XMLHttpRequest();
+  request.open("GET", `${embedUrl(videoId)}player.settings.json?ac=${Date.now()}`, true);
+  request.onreadystatechange = () => {
+    if (request.readyState !== 4) return;
+    if (request.status !== 200 && request.status !== 304) return;
+    w._vidalytics.embeds[videoId] = { type: "video", options: JSON.parse(request.responseText) };
+    run();
+  };
+  request.send();
+}
+
+function loadVidalytics(videoId: string, loader?: "settings") {
+  if (initializedEmbeds.has(videoId)) return;
+  initializedEmbeds.add(videoId);
+  if (loader === "settings") loadFromSettings(videoId);
+  else loadClassic(videoId);
 }
 
 /**
@@ -280,30 +359,32 @@ function VidalyticsVideo({
   videoId,
   eager = false,
   ratio = 56.25,
+  loader,
 }: {
   videoId: string;
   eager?: boolean;
   ratio?: number;
+  loader?: "settings";
 }) {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (eager) {
-      loadVidalytics(videoId);
+      loadVidalytics(videoId, loader);
       return;
     }
     const node = mountRef.current;
     if (!node) return;
 
     if (typeof IntersectionObserver === "undefined") {
-      loadVidalytics(videoId);
+      loadVidalytics(videoId, loader);
       return;
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) {
-          loadVidalytics(videoId);
+          loadVidalytics(videoId, loader);
           observer.disconnect();
         }
       },
@@ -311,12 +392,12 @@ function VidalyticsVideo({
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [videoId, eager]);
+  }, [videoId, eager, loader]);
 
   return (
     <div ref={mountRef} className="vcc-video">
       <div
-        id={`vidalytics_embed_${videoId}`}
+        id={loader === "settings" ? videoId : `vidalytics_embed_${videoId}`}
         className="vcc-video-mount"
         style={{ paddingTop: `${ratio}%` }}
       />
@@ -345,16 +426,8 @@ function SectionCard({
   );
 }
 
-/** Name on the first line, location on the second — never split mid-location by
- *  the column width. */
-function PartnerName({ name, location }: { name: string; location: string }) {
-  return (
-    <p className="vcc-partner__name">
-      - {name}
-      <br />
-      {location}
-    </p>
-  );
+function PartnerName({ name }: { name: string }) {
+  return <p className="vcc-partner__name">- {name}</p>;
 }
 
 function Divider() {
@@ -473,22 +546,12 @@ export default function CallConfirmationPage() {
           {/* Step 4 */}
           <SectionCard title="Step 4: Hear From Our Partners" bodyClassName="vcc-body vcc-partners">
             <div className="vcc-partners__grid">
-              {PARTNERS_PORTRAIT.map(({ name, location, videoId }) => (
+              {PARTNERS.map(({ name, videoId, loader }) => (
                 <div key={videoId} className="vcc-partner">
-                  <PartnerName name={name} location={location} />
-                  <VidalyticsVideo videoId={videoId} ratio={PORTRAIT_RATIO} />
+                  <PartnerName name={name} />
+                  <VidalyticsVideo videoId={videoId} ratio={PORTRAIT_RATIO} loader={loader} />
                 </div>
               ))}
-              {/* Spans the two columns beside the tenth portrait clip on desktop,
-                  and the full width once the grid drops to two columns. */}
-              <div className="vcc-partners__stack">
-                {PARTNERS_LANDSCAPE.map(({ name, location, videoId, ratio }) => (
-                  <div key={videoId} className="vcc-partner-wide">
-                    <PartnerName name={name} location={location} />
-                    <VidalyticsVideo videoId={videoId} ratio={ratio} />
-                  </div>
-                ))}
-              </div>
             </div>
           </SectionCard>
 
@@ -835,20 +898,14 @@ body:has(.vcc-page) {
 }
 
 /*
- * The landscape pair occupies the two columns left free by the tenth portrait
- * clip. Its width is capped so the two stacked clips plus their names come out
- * the same height as the portrait clip beside them — at full span they would
- * overshoot it by roughly 300px and leave the row visibly ragged.
+ * 22 clips over three columns leave one alone on the last row, hard against the
+ * left edge. Pulling it into the middle column keeps the block symmetrical.
+ *
+ * Desktop only: at two columns 22 divides evenly, and this selector would still
+ * match the final card there and move one that is already where it belongs.
  */
-.vcc-partners__stack {
-  grid-column: span 2;
-  grid-row: span 2;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: 100%;
-  max-width: 444px;
-  margin: 0 auto;
+@media (min-width: 768px) {
+  .vcc-partner:last-child:nth-child(3n + 1) { grid-column: 2; }
 }
 
 /* Montserrat 800 is used for these names only — nothing else on the page uses
@@ -1151,10 +1208,7 @@ body:has(.vcc-page) {
   /* Two across rather than three: ten splits evenly into 2 or 5 columns only, and
      three would leave a single orphan on the last row. */
   .vcc-body.vcc-partners { padding: 24px 15px 20px; }
-  /* Two portrait clips across; the landscape stack then spans both columns at
-     full width, so it needs no cap here. */
   .vcc-partners__grid { grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
-  .vcc-partners__stack { max-width: none; gap: 28px; }
 
   /* Two columns here comes from packColumns, not CSS — this only tightens the
      gaps to match the rest of the page at this width. */

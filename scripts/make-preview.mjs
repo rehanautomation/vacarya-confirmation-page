@@ -1,13 +1,16 @@
 /**
- * Wraps the WordPress fragment in a minimal document so it can be opened
- * directly: public/call-confirmation.html
+ * Overwrites dist/index.html with the WordPress fragment, so the deployed root
+ * URL serves the exact block that gets pasted into WordPress rather than the
+ * React build of the same page.
  *
- * The fragment has no <html>, charset or viewport of its own — a real theme
- * supplies those. Served bare it would render in quirks mode and a phone would
- * lay it out at 980px, so the wrapper exists purely to make what you see here
- * match what the theme will show.
+ * Runs after `vite build`, which writes its own SPA shell there first. The React
+ * app stays the way the page is edited (`npm run dev`); only what ships changes.
  *
- *   node scripts/build-wordpress-html.mjs && node scripts/make-preview.mjs
+ * The fragment has no <html>, charset or viewport of its own — a theme supplies
+ * those. Served bare it would render in quirks mode and a phone would lay it out
+ * at 980px, so the head below exists to make what you see at the root match what
+ * the theme will show. It is the head from the project's index.html, minus the
+ * module script that would boot React a second time.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -18,18 +21,32 @@ const fragment = fs.readFileSync(path.join(root, "wordpress/vacarya-call-confirm
 
 const doc = `<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vacarya — Call Confirmation</title>
-<style>html,body{margin:0;padding:0;}</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Congrats! Your Call Is Booked! · Vacarya</title>
+    <meta
+      name="description"
+      content="Your call is booked. Watch the video, accept the calendar invite, and get your questions answered before we speak."
+    />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
 ${fragment}
-</body>
+  </body>
 </html>
 `;
 
-const out = path.join(root, "public/call-confirmation.html");
+const out = path.join(root, "dist/index.html");
+if (!fs.existsSync(path.dirname(out))) {
+  throw new Error("dist/ is missing — run `vite build` first");
+}
 fs.writeFileSync(out, doc);
-console.log(`wrote public/call-confirmation.html  ${(Buffer.byteLength(doc) / 1024).toFixed(1)} KB`);
+console.log(`wrote dist/index.html  ${(Buffer.byteLength(doc) / 1024).toFixed(1)} KB (the pasteable page, served at /)`);

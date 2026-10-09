@@ -46,8 +46,7 @@ const literal = (start) => {
 
 const PAGE_CSS = between("const PAGE_CSS = `", "`;\n");
 const FAQ = literal("const FAQ_QUESTIONS = [");
-const PORTRAIT = literal("const PARTNERS_PORTRAIT: Partner[] = [");
-const LANDSCAPE = literal("const PARTNERS_LANDSCAPE: (Partner & { ratio: number })[] = [");
+const PARTNERS = literal("const PARTNERS: Partner[] = [");
 const CASE_STUDIES = literal("const CASE_STUDIES: { title: string; videoId: string }[] = [");
 const REVIEWS = literal("const REVIEWS: Review[] = [");
 
@@ -87,12 +86,19 @@ function packColumns(items, columnCount) {
   return columns;
 }
 
-const video = (videoId, ratio = 56.25) =>
-  `<div class="vcc-video" data-video="${videoId}" data-ratio="${ratio}">` +
-  `<div id="vidalytics_embed_${videoId}" class="vcc-video-mount" style="padding-top:${ratio}%"></div></div>`;
+/*
+ * Two embed kinds share this page. The classic snippet mounts into
+ * vidalytics_embed_<id>; the player.settings.json snippet mounts into the bare
+ * <id>. Getting that wrong leaves a silent empty box, so the id follows the
+ * loader rather than a single convention.
+ */
+const video = (videoId, ratio = 56.25, loader) =>
+  `<div class="vcc-video" data-video="${videoId}" data-ratio="${ratio}"` +
+  (loader ? ` data-loader="${loader}"` : "") +
+  `><div id="${loader === "settings" ? videoId : `vidalytics_embed_${videoId}`}" ` +
+  `class="vcc-video-mount" style="padding-top:${ratio}%"></div></div>`;
 
-const partnerName = (name, location) =>
-  `<p class="vcc-partner__name">- ${esc(name)}<br>${esc(location)}</p>`;
+const partnerName = (name) => `<p class="vcc-partner__name">- ${esc(name)}</p>`;
 
 const card = (title, bodyClass, inner) =>
   `<section class="vcc-card"><h2 class="vcc-card__header">${esc(title)}</h2>` +
@@ -151,16 +157,11 @@ const body = `
       "Step 4: Hear From Our Partners",
       "vcc-body vcc-partners",
       `<div class="vcc-partners__grid">` +
-        PORTRAIT.map(
+        PARTNERS.map(
           (p) =>
-            `<div class="vcc-partner">${partnerName(p.name, p.location)}${video(p.videoId, PORTRAIT_RATIO)}</div>`,
+            `<div class="vcc-partner">${partnerName(p.name)}${video(p.videoId, PORTRAIT_RATIO, p.loader)}</div>`,
         ).join("") +
-        `<div class="vcc-partners__stack">` +
-        LANDSCAPE.map(
-          (p) =>
-            `<div class="vcc-partner-wide">${partnerName(p.name, p.location)}${video(p.videoId, p.ratio)}</div>`,
-        ).join("") +
-        `</div></div>`,
+        `</div>`,
     )}
     ${divider}
     ${card(
@@ -263,13 +264,63 @@ const SCRIPT = `
   var ACCOUNT = ${JSON.stringify(VIDALYTICS_ACCOUNT)};
   var REVIEWS = ${JSON.stringify(REVIEWS.map((r) => ({ ...r, src: asset(r.src) })))};
 
-  /* --- Vidalytics: one loader per player, never twice ------------------- */
+  /* --- Vidalytics: one loader per player, never twice -------------------
+   * Two embed snippets are in play. The classic one fetches loader.min.js and
+   * player.min.js itself and then runs the embed. The player.settings.json one
+   * fetches only its config and then polls for the player class, relying on
+   * something else having pulled the scripts in — so ensurePlayer loads them
+   * without running anything, and these never depend on a classic embed being
+   * present. Their container id is the bare video id, not the prefixed one.
+   */
   var started = {};
-  function load(videoId) {
+  var base = function (videoId) {
+    return 'https://fast.vidalytics.com/embeds/' + ACCOUNT + '/' + videoId + '/';
+  };
+
+  var playerLoading = false;
+  function ensurePlayer(videoId) {
+    if (playerLoading) return;
+    playerLoading = true;
+    var add = function (src, cb) {
+      var el = document.createElement('script');
+      el.type = 'text/javascript'; el.async = true; el.src = src;
+      el.onload = cb; el.onerror = cb;
+      document.head.appendChild(el);
+    };
+    add(base(videoId) + 'loader.min.js', function () {
+      add(base(videoId) + 'player.min.js', function () {});
+    });
+  }
+
+  function loadFromSettings(videoId) {
+    window._vidalytics = window._vidalytics || {};
+    window._vidalytics.embeds = window._vidalytics.embeds || {};
+    ensurePlayer(videoId);
+
+    var run = function () {
+      if (window.Vidalytics && window.Vidalytics.Embed) {
+        var e = new window.Vidalytics.Embed();
+        e.run(videoId); e.loadCss();
+      } else { setTimeout(run, 500); }
+    };
+
+    var x = new XMLHttpRequest();
+    x.open('GET', base(videoId) + 'player.settings.json?ac=' + (new Date()).getTime(), true);
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4) return;
+      if (x.status !== 200 && x.status !== 304) return;
+      window._vidalytics.embeds[videoId] = { type: 'video', options: JSON.parse(x.responseText) };
+      run();
+    };
+    x.send();
+  }
+
+  function load(videoId, loader) {
     if (started[videoId]) return;
     started[videoId] = 1;
+    if (loader === 'settings') { loadFromSettings(videoId); return; }
     var embedId = 'vidalytics_embed_' + videoId;
-    var url = 'https://fast.vidalytics.com/embeds/' + ACCOUNT + '/' + videoId + '/';
+    var url = base(videoId);
     (function (v, i, d, a, l, y, t, c, s) {
       y='_'+d.toLowerCase();c=d+'L';if(!v[d]){v[d]={};}if(!v[c]){v[c]={};}if(!v[y]){v[y]={};}
       var vl='Loader',vli=v[y][vl],vsl=v[c][vl+'Script'],vlf=v[c][vl+'Loaded'],ve='Embed';
@@ -284,18 +335,19 @@ const SCRIPT = `
   }
 
   var slots = [].slice.call(document.querySelectorAll('.vcc-video'));
+  var kick = function (el) { load(el.getAttribute('data-video'), el.getAttribute('data-loader')); };
   var first = slots[0];
-  if (first) load(first.getAttribute('data-video'));          // Step 1 eager
+  if (first) kick(first);                                     // Step 1 eager
 
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (e.isIntersecting) { load(e.target.getAttribute('data-video')); io.unobserve(e.target); }
+        if (e.isIntersecting) { kick(e.target); io.unobserve(e.target); }
       });
     }, { rootMargin: '400px' });
     slots.slice(1).forEach(function (el) { io.observe(el); });
   } else {
-    slots.slice(1).forEach(function (el) { load(el.getAttribute('data-video')); });
+    slots.slice(1).forEach(kick);
   }
 
   /* --- Reviews masonry: repack when the column count changes ------------ */
@@ -424,5 +476,5 @@ fs.writeFileSync(outFile, html);
 
 console.log(`wrote ${path.relative(root, outFile)}`);
 console.log(`  ${(Buffer.byteLength(html) / 1024).toFixed(1)} KB`);
-console.log(`  ${FAQ.length} FAQ · ${PORTRAIT.length + LANDSCAPE.length} partners · ${CASE_STUDIES.length} case studies`);
+console.log(`  ${FAQ.length} FAQ · ${PARTNERS.length} partners · ${CASE_STUDIES.length} case studies`);
 console.log(`  ${REVIEWS.length} reviews · ${EARNINGS_COUNT} revenue · assets from ${ASSET_BASE}`);

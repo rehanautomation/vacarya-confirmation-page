@@ -200,7 +200,7 @@ const body = `
 
   <footer class="vcc-footer">
     <div class="vcc-footer__inner">
-      <img class="vcc-footer__logo" src="${asset("/vacarya-logo.webp")}" alt="Vacarya" width="260" height="223">
+      <img class="vcc-footer__logo" src="${asset("/vacarya-logo.webp")}" alt="Vacarya" width="800" height="118">
       <p class="vcc-footer__links"><a href="${TERMS_URL}">TERMS</a> | <a href="${PRIVACY_URL}">PRIVACY</a></p>
       <p class="vcc-footer__copy">All rights reserved 2026. This program is brought to you and copyrighted by Vacarya LP</p>
     </div>

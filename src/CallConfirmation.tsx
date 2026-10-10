@@ -657,8 +657,8 @@ export default function CallConfirmationPage() {
               className="vcc-footer__logo"
               src="/vacarya-logo.webp"
               alt="Vacarya"
-              width={260}
-              height={223}
+              width={800}
+              height={118}
             />
             <p className="vcc-footer__links">
               <a href={TERMS_URL}>TERMS</a> | <a href={PRIVACY_URL}>PRIVACY</a>
@@ -1157,12 +1157,13 @@ body:has(.vcc-page) {
   box-sizing: border-box;
 }
 
-/* Sized by height so the near-square mark (876×751) stays proportionate above
-   the links. Sits on the black band, which the PNG's transparency relies on. */
+/* The wordmark is 6.8:1, so it is sized by width — set a height and it would
+   run most of the footer's width. White lettering on transparency, which is why
+   it needs the black band under it. */
 .vcc-footer__logo {
   display: block;
-  height: 110px;
-  width: auto;
+  width: 280px;
+  height: auto;
   margin: 0 auto 18px;
 }
 
@@ -1274,7 +1275,7 @@ body:has(.vcc-page) {
 
 
   .vcc-footer__inner { padding: 0 10px; }
-  .vcc-footer__logo { height: 84px; margin-bottom: 14px; }
+  .vcc-footer__logo { width: 190px; margin-bottom: 14px; }
   .vcc-footer__links { font-size: 18px; }
   .vcc-footer__copy { font-size: 14px; }
 }

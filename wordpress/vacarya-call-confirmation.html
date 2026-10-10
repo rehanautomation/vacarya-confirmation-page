@@ -509,12 +509,13 @@ body:has(.vcc-page) {
   box-sizing: border-box;
 }
 
-/* Sized by height so the near-square mark (876×751) stays proportionate above
-   the links. Sits on the black band, which the PNG's transparency relies on. */
+/* The wordmark is 6.8:1, so it is sized by width — set a height and it would
+   run most of the footer's width. White lettering on transparency, which is why
+   it needs the black band under it. */
 .vcc-footer__logo {
   display: block;
-  height: 110px;
-  width: auto;
+  width: 280px;
+  height: auto;
   margin: 0 auto 18px;
 }
 
@@ -626,7 +627,7 @@ body:has(.vcc-page) {
 
 
   .vcc-footer__inner { padding: 0 10px; }
-  .vcc-footer__logo { height: 84px; margin-bottom: 14px; }
+  .vcc-footer__logo { width: 190px; margin-bottom: 14px; }
   .vcc-footer__links { font-size: 18px; }
   .vcc-footer__copy { font-size: 14px; }
 }
@@ -671,7 +672,7 @@ body:has(.vcc-page) {
 
   <footer class="vcc-footer">
     <div class="vcc-footer__inner">
-      <img class="vcc-footer__logo" src="https://vacarya-confirmation-page.vercel.app/vacarya-logo.webp" alt="Vacarya" width="260" height="223">
+      <img class="vcc-footer__logo" src="https://vacarya-confirmation-page.vercel.app/vacarya-logo.webp" alt="Vacarya" width="800" height="118">
       <p class="vcc-footer__links"><a href="https://hostvacarya.com/termsofservice/">TERMS</a> | <a href="https://hostvacarya.com/privacy/">PRIVACY</a></p>
       <p class="vcc-footer__copy">All rights reserved 2026. This program is brought to you and copyrighted by Vacarya LP</p>
     </div>
